@@ -1,0 +1,310 @@
+<section class="club-invite-page">
+  <header class="club-invite-header">
+    <div class="club-invite-header__brand">
+      <span class="club-invite-header__mark">Z</span>
+      <strong>Zepter BizzClub</strong>
+    </div>
+
+    <button type="button" class="club-invite-header__close" (click)="closePage()">
+      ✕
+    </button>
+  </header>
+
+  <div class="club-invite-content">
+    <section class="club-hero">
+      <h1>Zepter BizzClub</h1>
+      <p>
+        Inspirišite nove članove, ostvarite dodatne pogodnosti i podelite
+        Zepter iskustvo sa drugima.
+      </p>
+    </section>
+
+    <section class="club-accordion">
+      @for (section of sections(); track section.id) {
+        <article class="accordion-card">
+          <button
+            type="button"
+            class="accordion-card__head"
+            (click)="toggleSection(section.id)"
+          >
+            <span class="accordion-card__toggle">
+              {{ section.expanded ? '−' : '+' }}
+            </span>
+
+            <strong>{{ section.title }}</strong>
+          </button>
+
+          @if (section.expanded) {
+            <div class="accordion-card__body">
+              @if (section.id === 'discounts') {
+                <p class="accordion-card__text">
+                  Što je veća ukupna kupovina, to je i veći nivo popusta. Novi
+                  članovi odmah ulaze u svet pogodnosti i mogu kupovati po
+                  privilegovanim cenama.
+                </p>
+
+                <div class="benefits-table">
+                  <div class="benefits-table__row benefits-table__row--head">
+                    <span>Vrednost kupovine</span>
+                    <span>Popust</span>
+                  </div>
+
+                  @for (tier of discountTiers; track tier.level) {
+                    <div class="benefits-table__row">
+                      <span>{{ tier.amount }}</span>
+                      <span>{{ tier.discount }} {{ tier.level }}</span>
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (section.id === 'invite') {
+                <p class="accordion-card__text">
+                  Registrujte nove članove i ostvarujete dodatnu preporučilačku
+                  nagradu. Što više aktivnih članova imate, to su veće pogodnosti.
+                </p>
+
+                <div class="benefits-table">
+                  <div class="benefits-table__row benefits-table__row--head">
+                    <span>Broj članova</span>
+                    <span>Pogodnost</span>
+                  </div>
+
+                  @for (tier of inviteRewardTiers; track tier.summary) {
+                    <div class="benefits-table__row">
+                      <span>{{ tier.count }}</span>
+                      <span>{{ tier.summary }}</span>
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (section.id === 'sell') {
+                <ul class="club-bullets">
+                  <li>
+                    Započnite preporuke i ostvarujte bonus od 5% do 40% na
+                    prodaju i preporuke.
+                  </li>
+                  <li>
+                    Novi BizzClub partneri dobijaju iste pogodnosti koje i vi imate.
+                  </li>
+                  <li>
+                    Gradite svoju mrežu i razvijajte dodatni prihod kroz
+                    Zepter ekosistem.
+                  </li>
+                </ul>
+
+                <button type="button" class="training-button">
+                  Prijava za Zepter trening
+                </button>
+              }
+            </div>
+          }
+        </article>
+      }
+    </section>
+
+    <section class="account-card">
+      <div class="account-card__icon">👤</div>
+
+      <div class="account-card__content">
+        <p>Vaš nalog <strong>{{ accountName() }}</strong></p>
+        <span>Broj registrovanih članova <strong>{{ registeredMembersCount() }}</strong></span>
+      </div>
+    </section>
+
+    <section class="invite-promo">
+      <div class="invite-promo__top">
+        <div>
+          <h2>Učlanite nove partnere</h2>
+          <p>
+            Premija do 10% na njihovu prvu kupovinu i provizija od 5% do 40%
+            kroz dalju kupovinu.
+          </p>
+        </div>
+
+        <button type="button" class="share-button" (click)="shareInvite()">
+          ⤴
+        </button>
+      </div>
+
+      @if (shareMessage()) {
+        <p class="share-message">{{ shareMessage() }}</p>
+      }
+
+      <ul class="invite-promo__bullets">
+        <li>
+          Pozovite nove partnere u <strong>Zepter BizzClub</strong> i podelite
+          im pogodnosti članstva.
+        </li>
+        <li>
+          Novi članovi dobijaju iste osnovne privilegije i pristup Zepter svetu.
+        </li>
+      </ul>
+    </section>
+
+    <section class="invite-form-card">
+      <label class="form-field">
+        <span>Ime *</span>
+        <input
+          type="text"
+          [value]="form().firstName"
+          (input)="updateField('firstName', $any($event.target).value)"
+          placeholder="Unesite ime"
+        />
+      </label>
+
+      <label class="form-field">
+        <span>Prezime *</span>
+        <input
+          type="text"
+          [value]="form().lastName"
+          (input)="updateField('lastName', $any($event.target).value)"
+          placeholder="Unesite prezime"
+        />
+      </label>
+
+      <label class="form-field">
+        <span>Email *</span>
+        <input
+          type="email"
+          [value]="form().email"
+          (input)="updateField('email', $any($event.target).value)"
+          placeholder="Unesite email adresu"
+        />
+      </label>
+
+      <div class="phone-row">
+        <label class="form-field form-field--prefix">
+          <span>Pozivni</span>
+          <input
+            type="text"
+            [value]="form().phonePrefix"
+            (input)="updateField('phonePrefix', $any($event.target).value)"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Telefon *</span>
+          <input
+            type="tel"
+            [value]="form().phone"
+            (input)="updateField('phone', $any($event.target).value)"
+            placeholder="Unesite broj telefona"
+          />
+        </label>
+      </div>
+
+      <p class="form-note">Polja označena zvezdicom su obavezna.</p>
+
+      <button
+        type="button"
+        class="privileged-toggle"
+        [class.privileged-toggle--active]="form().privilegedPriceEnabled"
+        (click)="togglePrivilegedPrice()"
+      >
+        <span class="privileged-toggle__checkbox">
+          @if (form().privilegedPriceEnabled) {
+            ✓
+          }
+        </span>
+
+        <strong>Aktivirajte privilegovanu cenu za novog člana</strong>
+      </button>
+
+      @if (form().privilegedPriceEnabled) {
+        <section class="privileged-card">
+          <div class="privileged-card__block">
+            <p>Izaberite nivo privilegovane cene</p>
+
+            <div class="option-grid">
+              @for (discount of privilegedDiscountOptions; track discount) {
+                <button
+                  type="button"
+                  class="option-chip"
+                  [class.option-chip--active]="form().privilegedDiscount === discount"
+                  (click)="selectDiscount(discount)"
+                >
+                  do {{ discount }}%
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="privileged-card__block">
+            <p>Izaberite broj dana trajanja pogodnosti</p>
+
+            <div class="days-grid">
+              @for (days of privilegedDurationOptions; track days) {
+                <button
+                  type="button"
+                  class="day-chip"
+                  [class.day-chip--active]="form().privilegedDays === days"
+                  (click)="selectPrivilegedDays(days)"
+                >
+                  {{ days }} dana
+                </button>
+              }
+            </div>
+          </div>
+        </section>
+      }
+
+      <section class="captcha-section">
+        <div class="captcha-box">
+          <div class="captcha-box__value">{{ captchaCode() }}</div>
+          <button type="button" class="captcha-box__refresh" (click)="refreshCaptcha()">
+            ↻
+          </button>
+        </div>
+
+        <label class="form-field">
+          <span>Unesite kod sa slike *</span>
+          <input
+            type="text"
+            [value]="form().captchaInput"
+            (input)="updateField('captchaInput', $any($event.target).value.toUpperCase())"
+            placeholder="Unesite captcha kod"
+          />
+        </label>
+      </section>
+
+      @if (errorMessage()) {
+        <p class="form-error">{{ errorMessage() }}</p>
+      }
+
+      <button type="button" class="submit-button" (click)="submitInvite()">
+        {{ submitting() ? 'Slanje...' : 'Pozovi člana' }}
+      </button>
+    </section>
+  </div>
+
+  @if (successModalOpen()) {
+    <div class="success-modal-backdrop" (click)="closeSuccessModal()"></div>
+
+    <section class="success-modal">
+      <button type="button" class="success-modal__close" (click)="closeSuccessModal()">
+        ✕
+      </button>
+
+      <img
+        src="/assets/images/logos/zepter-logo.png"
+        alt="Zepter"
+        class="success-modal__logo"
+      />
+
+      <div class="success-modal__icon">✓</div>
+
+      <h3>Novi član je uspešno pozvan</h3>
+
+      <p>
+        Poziv je evidentiran. Možete odmah poslati novu preporuku ili nastaviti
+        sa radom u aplikaciji.
+      </p>
+
+      <button type="button" class="success-modal__button" (click)="closeSuccessModal()">
+        U redu
+      </button>
+    </section>
+  }
+</section>

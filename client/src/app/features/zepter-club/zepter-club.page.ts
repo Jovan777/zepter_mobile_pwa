@@ -1,47 +1,308 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { ClientService } from '../../core/services/client.service';
+
+type BenefitSectionId = 'discounts' | 'invite' | 'sell';
+
+interface BenefitSection {
+  id: BenefitSectionId;
+  title: string;
+  expanded: boolean;
+}
+
+interface InviteForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phonePrefix: string;
+  phone: string;
+  privilegedPriceEnabled: boolean;
+  privilegedDiscount: number | null;
+  privilegedDays: number | null;
+  captchaInput: string;
+}
 
 @Component({
   selector: 'app-zepter-club',
   standalone: true,
-  template: `
-    <section class="page-placeholder">
-      <p class="eyebrow">Zepter Mobile PWA</p>
-      <h1>ZepterClub</h1>
-      <p>Planovi, pogodnosti i invite tok.</p>
-    </section>
-  `,
-  styles: [
-    `
-      .page-placeholder {
-        min-height: 100dvh;
-        padding: 32px 20px;
-        display: grid;
-        align-content: center;
-        gap: 12px;
-        color: var(--zepter-text);
-      }
-
-      .eyebrow {
-        margin: 0;
-        color: var(--zepter-blue);
-        font-size: 12px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-      }
-
-      h1 {
-        margin: 0;
-        font-size: 32px;
-        line-height: 1.05;
-      }
-
-      p {
-        margin: 0;
-        color: var(--zepter-muted);
-        line-height: 1.6;
-      }
-    `
-  ]
+  templateUrl: './zepter-club.page.html',
+  styleUrl: './zepter-club.page.scss'
 })
-export class ZepterClubPage {}
+export class ZepterClubPage implements OnInit {
+  private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly clientService = inject(ClientService);
+
+  readonly sections = signal<BenefitSection[]>([
+    {
+      id: 'discounts',
+      title: 'Kupujte po povoljnijoj ceni — popusti od 5% do 40%',
+      expanded: true
+    },
+    {
+      id: 'invite',
+      title: 'Pozovite partnera u Zepter Club — dobijate premiju do 10%',
+      expanded: false
+    },
+    {
+      id: 'sell',
+      title: 'Počnite da zarađujete — bonusi od 5% do 40%',
+      expanded: false
+    }
+  ]);
+
+  readonly discountTiers = [
+    { amount: '10 €', level: 'DL1', discount: '-5%' },
+    { amount: '100 €', level: 'DL2', discount: '-10%' },
+    { amount: '1500 €', level: 'DL3', discount: '-15%' },
+    { amount: '3000 €', level: 'DL4', discount: '-20%' },
+    { amount: '6000 €', level: 'DL5', discount: '-25%' },
+    { amount: '15000 €', level: 'DL6', discount: '-30%' },
+    { amount: '30000 €', level: 'DL7', discount: '-35%' },
+    { amount: '40000 €', level: 'DL8', discount: '-40%' }
+  ];
+
+  readonly inviteRewardTiers = [
+    { count: '-', summary: 'DL1 · -5% · 10 €' },
+    { count: '-', summary: 'DL2 · -10% · 100 €' },
+    { count: '1', summary: 'DL3 · -15% · 600 €' },
+    { count: '2', summary: 'DL4 · -20% · 1500 €' },
+    { count: '3', summary: 'DL5 · -25% · 3000 €' },
+    { count: '4', summary: 'DL6 · -30% · 5000 €' },
+    { count: '20', summary: 'DL7 · -35% · 10000 €' },
+    { count: '30', summary: 'DL8 · -40% · 20000 €' }
+  ];
+
+  readonly privilegedDiscountOptions = [25, 30, 35, 40];
+  readonly privilegedDurationOptions = [3, 5, 7];
+
+  readonly form = signal<InviteForm>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phonePrefix: '+381',
+    phone: '',
+    privilegedPriceEnabled: false,
+    privilegedDiscount: null,
+    privilegedDays: null,
+    captchaInput: ''
+  });
+
+  readonly registeredMembersCount = signal(0);
+  readonly captchaCode = signal('');
+  readonly shareMessage = signal('');
+  readonly errorMessage = signal('');
+  readonly submitting = signal(false);
+  readonly successModalOpen = signal(false);
+
+  readonly accountName = computed(() => {
+    const user = this.authService.user();
+
+    if (!user) {
+      return 'Gost';
+    }
+
+    return `${user.firstName} ${user.lastName}`.trim();
+  });
+
+  ngOnInit(): void {
+    this.refreshCaptcha();
+    this.loadRegisteredMembersCount();
+  }
+
+  closePage(): void {
+    this.router.navigateByUrl('/app/profile');
+  }
+
+  toggleSection(sectionId: BenefitSectionId): void {
+    this.sections.update((sections) =>
+      sections.map((section) =>
+        section.id === sectionId
+          ? { ...section, expanded: !section.expanded }
+          : section
+      )
+    );
+  }
+
+  updateField<K extends keyof InviteForm>(field: K, value: InviteForm[K]): void {
+    this.form.update((form) => ({
+      ...form,
+      [field]: value
+    }));
+  }
+
+  togglePrivilegedPrice(): void {
+    this.form.update((form) => {
+      const enabled = !form.privilegedPriceEnabled;
+
+      return {
+        ...form,
+        privilegedPriceEnabled: enabled,
+        privilegedDiscount: enabled ? form.privilegedDiscount : null,
+        privilegedDays: enabled ? form.privilegedDays : null
+      };
+    });
+  }
+
+  selectDiscount(discount: number): void {
+    this.form.update((form) => ({
+      ...form,
+      privilegedDiscount: discount
+    }));
+  }
+
+  selectPrivilegedDays(days: number): void {
+    this.form.update((form) => ({
+      ...form,
+      privilegedDays: days
+    }));
+  }
+
+  refreshCaptcha(): void {
+    this.captchaCode.set(this.generateCaptcha());
+    this.form.update((form) => ({
+      ...form,
+      captchaInput: ''
+    }));
+  }
+
+  async shareInvite(): Promise<void> {
+    const text =
+      `Pridružite se Zepter BizzClub-u preko moje preporuke.\n` +
+      `Kupujte uz pogodnosti, ostvarite članstvo i uživajte u Zepter privilegijama.\n` +
+      `Vaš preporučilac: ${this.accountName()}.`;
+
+    this.shareMessage.set('');
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: 'Zepter BizzClub poziv',
+          text
+        });
+
+        this.shareMessage.set('Poziv je uspešno podeljen.');
+        return;
+      }
+
+      await navigator.clipboard.writeText(text);
+      this.shareMessage.set('Tekst poziva je kopiran i spreman za slanje.');
+    } catch {
+      this.shareMessage.set('Deljenje trenutno nije uspelo. Pokušajte ponovo.');
+    }
+  }
+
+  submitInvite(): void {
+    this.errorMessage.set('');
+    this.shareMessage.set('');
+
+    if (!this.validateForm()) {
+      return;
+    }
+
+    this.submitting.set(true);
+
+    window.setTimeout(() => {
+      this.submitting.set(false);
+      this.successModalOpen.set(true);
+      this.registeredMembersCount.update((count) => count + 1);
+      this.resetForm();
+      this.refreshCaptcha();
+    }, 700);
+  }
+
+  closeSuccessModal(): void {
+    this.successModalOpen.set(false);
+  }
+
+  private loadRegisteredMembersCount(): void {
+    const userPublicId = this.authService.user()?.publicId;
+
+    this.clientService.getClients(userPublicId).subscribe({
+      next: (clients) => this.registeredMembersCount.set(clients.length),
+      error: () => this.registeredMembersCount.set(0)
+    });
+  }
+
+  private validateForm(): boolean {
+    const form = this.form();
+
+    if (!form.firstName.trim()) {
+      this.errorMessage.set('Unesite ime.');
+      return false;
+    }
+
+    if (!form.lastName.trim()) {
+      this.errorMessage.set('Unesite prezime.');
+      return false;
+    }
+
+    if (!form.email.trim()) {
+      this.errorMessage.set('Unesite email adresu.');
+      return false;
+    }
+
+    if (!/.+@.+\..+/.test(form.email.trim())) {
+      this.errorMessage.set('Unesite ispravnu email adresu.');
+      return false;
+    }
+
+    if (!form.phone.trim()) {
+      this.errorMessage.set('Unesite broj telefona.');
+      return false;
+    }
+
+    if (form.phone.trim().length < 6) {
+      this.errorMessage.set('Broj telefona je prekratak.');
+      return false;
+    }
+
+    if (form.privilegedPriceEnabled && form.privilegedDiscount === null) {
+      this.errorMessage.set('Izaberite nivo privilegovane cene.');
+      return false;
+    }
+
+    if (form.privilegedPriceEnabled && form.privilegedDays === null) {
+      this.errorMessage.set('Izaberite koliko dana traje privilegovana cena.');
+      return false;
+    }
+
+    if (!form.captchaInput.trim()) {
+      this.errorMessage.set('Unesite kod sa captcha slike.');
+      return false;
+    }
+
+    if (form.captchaInput.trim().toUpperCase() !== this.captchaCode()) {
+      this.errorMessage.set('Captcha kod nije ispravan.');
+      return false;
+    }
+
+    return true;
+  }
+
+  private resetForm(): void {
+    this.form.set({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phonePrefix: '+381',
+      phone: '',
+      privilegedPriceEnabled: false,
+      privilegedDiscount: null,
+      privilegedDays: null,
+      captchaInput: ''
+    });
+  }
+
+  private generateCaptcha(): string {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let value = '';
+
+    for (let i = 0; i < 5; i += 1) {
+      value += chars[Math.floor(Math.random() * chars.length)];
+    }
+
+    return value;
+  }
+}
