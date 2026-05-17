@@ -1,0 +1,15 @@
+<a class="banner-card" [routerLink]="link" [style.background-image]="backgroundImage">
+  <div class="banner-card__overlay"></div>
+
+  <div class="banner-card__content">
+    @if (label) {
+      <span>{{ label }}</span>
+    }
+
+    <strong>{{ title }}</strong>
+
+    @if (description) {
+      <p>{{ description }}</p>
+    }
+  </div>
+</a>

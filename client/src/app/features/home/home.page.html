@@ -1,0 +1,65 @@
+<section class="home mobile-page">
+  <app-search-bar placeholder="Pretražite proizvode, kategorije..." />
+
+  <app-mode-switcher />
+
+  <section class="home__club">
+    <span>ZepterClub</span>
+
+    <h1>Kupujte, prodajte i šaljite ponude iz jedne aplikacije.</h1>
+
+    <p>
+      Mobilni PWA koncept za Zepter BizzClub tokove: kupujem, prodajem i nudim.
+    </p>
+
+    <a routerLink="/app/zepter-club">Saznaj više</a>
+  </section>
+
+  <section class="mobile-section">
+    <div class="home__section-head">
+      <div>
+        <span>Katalog</span>
+        <h2>Kategorije</h2>
+      </div>
+
+      <a routerLink="/app/categories">Sve</a>
+    </div>
+
+    <div class="home__banners">
+      @for (banner of banners; track banner.title) {
+        <app-banner-card
+          [title]="banner.title"
+          [description]="banner.description"
+          [imageUrl]="banner.imageUrl"
+          [link]="banner.link"
+          [label]="banner.label"
+        />
+      }
+    </div>
+  </section>
+
+  <section class="mobile-section">
+    <div class="home__section-head">
+      <div>
+        <span>Zepter izbor</span>
+        <h2>Najprodavaniji proizvodi</h2>
+      </div>
+
+      <a routerLink="/app/categories">Katalog</a>
+    </div>
+
+    <div class="home__products">
+      @for (product of featuredProducts(); track product.publicId) {
+        <a class="home-product" [routerLink]="['/app/products', product.publicId]">
+          <div class="home-product__image">
+            <img [src]="product.images[0]" [alt]="product.name" />
+          </div>
+
+          <strong>{{ product.name }}</strong>
+
+          <span>{{ product.prices.clubMember | number: '1.0-0' }} RSD</span>
+        </a>
+      }
+    </div>
+  </section>
+</section>

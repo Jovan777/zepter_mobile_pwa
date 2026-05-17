@@ -1,0 +1,46 @@
+@if (isOpen) {
+<button class="drawer-backdrop" type="button" aria-label="Zatvori meni" (click)="close.emit()"></button>
+}
+
+<aside class="drawer" [class.drawer--open]="isOpen">
+    <div class="drawer__top">
+        <button class="drawer__back" type="button" aria-label="Zatvori meni" (click)="close.emit()">←</button>
+
+        <img class="drawer__logo" src="/assets/images/logos/zepter-logo.png" alt="Zepter" />
+
+        <button class="drawer__close" type="button" aria-label="Zatvori meni" (click)="close.emit()">×</button>
+    </div>
+
+    <section class="drawer__profile">
+        <span>Trenutni režim</span>
+        <strong>{{ modeLabel() }}</strong>
+        <p>{{ regionName }}</p>
+    </section>
+
+    <nav class="drawer__nav" (click)="close.emit()">
+        <a routerLink="/app/home">Početna</a>
+        <a routerLink="/app/categories">Katalog proizvoda</a>
+        <a routerLink="/app/cart">Korpa</a>
+        <a routerLink="/app/wishlist">Lista želja</a>
+        <a routerLink="/app/orders">Porudžbine</a>
+        <a routerLink="/app/zepter-club">ZepterClub</a>
+        @if (authService.isLoggedIn()) {
+        <a routerLink="/app/profile">Moj profil</a>
+        <a routerLink="/app/clients">Moji klijenti</a>
+        } @else {
+        <a routerLink="/login">Prijava / registracija</a>
+        }
+        <a routerLink="/app/language">Jezik i područje</a>
+        <a routerLink="/app/help">Pomoć</a>
+    </nav>
+
+    <footer class="drawer__footer">
+        @if (authService.isLoggedIn()) {
+        <button type="button" (click)="logout()">Odjavi se</button>
+        } @else {
+        <a class="drawer__login-link" routerLink="/login" (click)="close.emit()">Prijava</a>
+        }
+
+        <small>2.4.3 · PWA POC</small>
+    </footer>
+</aside>

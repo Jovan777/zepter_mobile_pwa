@@ -1,0 +1,18 @@
+<section class="categories mobile-page">
+  <header class="categories__header">
+    <span class="zp-chip">Katalog</span>
+    <h1>Kategorije proizvoda</h1>
+    <p>Pregled glavnih Zepter kategorija prilagođen mobilnoj aplikaciji.</p>
+  </header>
+
+  <div class="categories__list">
+    @for (category of categories(); track category.publicId) {
+      <app-banner-card
+        [title]="category.name"
+        [description]="category.description"
+        [imageUrl]="category.imageUrl"
+        [link]="'/app/categories/' + category.slug"
+      />
+    }
+  </div>
+</section>

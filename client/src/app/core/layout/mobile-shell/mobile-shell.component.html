@@ -1,0 +1,33 @@
+<main class="mobile-shell">
+  <app-header (menuClick)="openDrawer()" />
+
+  <section class="mobile-shell__content">
+    <router-outlet />
+  </section>
+
+  <nav class="bottom-nav">
+    <a routerLink="/app/home" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      Početna
+    </a>
+
+    <a routerLink="/app/categories" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      Katalog
+    </a>
+
+    <a routerLink="/app/cart" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      Korpa
+    </a>
+
+    @if (authService.isLoggedIn()) {
+      <a routerLink="/app/profile" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+        Profil
+      </a>
+    } @else {
+      <a routerLink="/login" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+        Prijava
+      </a>
+    }
+  </nav>
+
+  <app-drawer [isOpen]="drawerOpen()" (close)="closeDrawer()" />
+</main>

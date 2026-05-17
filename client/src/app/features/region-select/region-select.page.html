@@ -1,0 +1,36 @@
+<section class="region-select">
+  <div class="region-select__shape region-select__shape--top"></div>
+  <div class="region-select__shape region-select__shape--bottom"></div>
+
+  <header class="region-select__header">
+    <img src="/assets/images/logos/zepter-logo.png" alt="Zepter" />
+    <span>BizzClub</span>
+  </header>
+
+  <section class="region-select__content">
+    <h1>Izaberite državu</h1>
+    <p>Region određuje jezik, valutu, dostupne proizvode i prikaz cena.</p>
+  </section>
+
+  <section class="region-select__list">
+    @if (loading()) {
+      <div class="region-select__loading">Učitavanje regiona...</div>
+    } @else {
+      @for (region of regions(); track region.code) {
+        <button class="region-select__row" type="button" (click)="selectRegion(region)">
+          <span class="region-select__flag">{{ region.code }}</span>
+
+          <span class="region-select__name">
+            {{ region.name }}
+          </span>
+
+          <span class="region-select__meta">
+            {{ region.currency }}
+          </span>
+
+          <span class="region-select__arrow">›</span>
+        </button>
+      }
+    }
+  </section>
+</section>

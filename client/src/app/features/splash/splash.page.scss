@@ -1,0 +1,96 @@
+.splash {
+  position: relative;
+  width: 100%;
+  max-width: var(--mobile-width);
+  min-height: 100dvh;
+  margin: 0 auto;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: var(--color-navy);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.18);
+}
+
+@media (max-width: 480px) {
+  .splash {
+    max-width: none;
+    box-shadow: none;
+  }
+}
+
+
+.splash__shape {
+  position: absolute;
+  width: 78vw;
+  max-width: 360px;
+  height: 108px;
+  opacity: 0.66;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.splash__shape--one {
+  top: 7%;
+  left: -20%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.66), transparent);
+}
+
+.splash__shape--two {
+  top: 31%;
+  right: -25%;
+  transform: rotate(180deg);
+  background: linear-gradient(90deg, rgba(225, 209, 179, 0.76), transparent);
+}
+
+.splash__shape--three {
+  bottom: 7%;
+  left: -18%;
+  background: linear-gradient(90deg, rgba(181, 151, 100, 0.72), transparent);
+}
+
+.splash__brand {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.splash__brand img {
+  width: min(64vw, 230px);
+  filter: brightness(0) invert(1);
+}
+
+.splash__brand span {
+  color: rgba(255, 255, 255, 0.55);
+  font-style: italic;
+}
+
+.splash__loader {
+  position: absolute;
+  bottom: 48px;
+  width: 44px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.splash__loader::after {
+  content: '';
+  display: block;
+  width: 46%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-gold);
+  animation: splash-loading 850ms ease-in-out infinite;
+}
+
+@keyframes splash-loading {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(230%);
+  }
+}

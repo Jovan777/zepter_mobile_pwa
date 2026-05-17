@@ -1,0 +1,13 @@
+<section class="mode-switcher" aria-label="Izbor režima">
+  @for (option of commerceModeService.options; track option.value) {
+    <button
+      type="button"
+      class="mode-switcher__item"
+      [class.mode-switcher__item--active]="commerceModeService.mode() === option.value"
+      (click)="selectMode(option.value)"
+    >
+      <strong>{{ option.label }}</strong>
+      <span>{{ option.description }}</span>
+    </button>
+  }
+</section>

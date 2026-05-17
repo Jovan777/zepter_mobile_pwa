@@ -1,0 +1,88 @@
+<section class="login-page">
+  <header class="login-page__top">
+    <img src="/assets/images/logos/zepter-logo.png" alt="Zepter" />
+
+    <button type="button" aria-label="Nastavi kao gost" (click)="continueAsGuest()">×</button>
+  </header>
+
+  <main class="login-page__content">
+    <section class="club-intro">
+      <div class="club-intro__logo">
+        <span>zepter</span>
+        <strong>CLUB</strong>
+      </div>
+
+      <h1>ZepterClub</h1>
+
+      <p>
+        Otkrijte svet pogodnosti, privilegovane kupovine i mogućnosti za preporuke i prodaju.
+      </p>
+    </section>
+
+    <section class="benefits">
+      @for (benefit of benefits(); track benefit.title; let index = $index) {
+        <article class="benefit">
+          <button class="benefit__toggle" type="button" (click)="toggleBenefit(index)">
+            {{ benefit.opened ? '−' : '+' }}
+          </button>
+
+          <div>
+            <h2>{{ benefit.title }}</h2>
+
+            @if (benefit.opened) {
+              <p>{{ benefit.text }}</p>
+            }
+          </div>
+        </article>
+      }
+    </section>
+
+    <section class="login-box">
+      <h2>Prijava</h2>
+      <p>u vaš profil</p>
+
+      <div class="login-box__divider"></div>
+
+      <label>
+        <span>Email ili broj telefona</span>
+        <input
+          type="text"
+          autocomplete="username"
+          [value]="emailOrPhone()"
+          (input)="updateEmailOrPhone($any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>Lozinka</span>
+
+        <div class="password-field">
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            autocomplete="current-password"
+            [value]="password()"
+            (input)="updatePassword($any($event.target).value)"
+          />
+
+          <button type="button" aria-label="Prikaži lozinku" (click)="togglePassword()">👁</button>
+        </div>
+      </label>
+
+      <a class="forgot-link">Zaboravili ste lozinku?</a>
+
+      @if (errorMessage()) {
+        <p class="login-box__error">{{ errorMessage() }}</p>
+      }
+
+      <button class="login-box__primary" type="button" [disabled]="loading()" (click)="login()">
+        {{ loading() ? 'Prijava...' : 'Prijavi se' }}
+      </button>
+
+
+      <div class="login-box__secondary">
+        <button type="button">Registracija</button>
+        <button type="button" (click)="continueAsGuest()">Nastavi kao gost</button>
+      </div>
+    </section>
+  </main>
+</section>

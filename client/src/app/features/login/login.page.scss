@@ -1,0 +1,281 @@
+.login-page {
+  width: 100%;
+  max-width: var(--mobile-width);
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: #efe5d4;
+  overflow-x: hidden;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.18);
+}
+
+@media (max-width: 480px) {
+  .login-page {
+    max-width: none;
+    box-shadow: none;
+  }
+}
+
+.login-page__top {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  height: 58px;
+  display: grid;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: center;
+  padding: 6px 14px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.login-page__top img {
+  grid-column: 2;
+  width: 126px;
+  justify-self: center;
+}
+
+.login-page__top button {
+  grid-column: 3;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 36px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.login-page__content {
+  width: 100%;
+  max-width: 100%;
+  padding: 24px 22px 30px;
+  overflow-x: hidden;
+}
+
+.club-intro {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+}
+
+.club-intro__logo {
+  justify-self: center;
+  min-width: 118px;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+  color: var(--color-gold-dark);
+}
+
+.club-intro__logo span {
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.club-intro__logo strong {
+  padding: 5px 12px;
+  background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold-dark));
+  color: #ffffff;
+  letter-spacing: 0.36em;
+  font-size: 18px;
+}
+
+.club-intro h1 {
+  margin: 0;
+  color: var(--color-gold-dark);
+  font-size: 36px;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.club-intro p {
+  margin: 0;
+  color: #1f1f1f;
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.benefits {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.benefit {
+  min-height: 74px;
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 14px;
+  border-radius: 10px;
+  background: rgba(225, 209, 179, 0.42);
+}
+
+.benefit__toggle {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--color-gold-dark);
+  font-size: 26px;
+  line-height: 1;
+}
+
+.benefit h2 {
+  margin: 0;
+  color: var(--color-gold-dark);
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+.benefit p {
+  margin: 8px 0 0;
+  color: #6d4d16;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.login-box {
+  display: grid;
+  gap: 14px;
+  margin-top: 34px;
+  text-align: center;
+}
+
+.login-box h2 {
+  margin: 0;
+  color: #000000;
+  font-size: 36px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.login-box > p {
+  margin: -6px 0 0;
+  font-size: 24px;
+}
+
+.login-box__divider {
+  width: 72%;
+  height: 1px;
+  justify-self: center;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.login-box label {
+  display: grid;
+  gap: 7px;
+  text-align: left;
+}
+
+.login-box label span {
+  color: var(--color-text-soft);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.login-box input {
+  width: 100%;
+  min-height: 58px;
+  border: 1px solid #cfc7bb;
+  border-radius: 8px;
+  padding: 0 14px;
+  background: #ffffff;
+  color: var(--color-text);
+  outline: none;
+  font-size: 16px;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 52px;
+}
+
+.password-field button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  background: transparent;
+  font-size: 20px;
+}
+
+.forgot-link {
+  justify-self: end;
+  color: var(--color-text);
+  text-decoration: underline;
+  font-size: 15px;
+}
+
+.login-box__error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(180, 35, 24, 0.08);
+  color: #b42318;
+  font-size: 14px;
+  text-align: left;
+}
+
+.login-box__primary {
+  min-height: 58px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--color-gold-dark);
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.login-box__demo {
+  min-height: 48px;
+  border: 1px solid var(--color-gold-dark);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-gold-dark);
+  font-weight: 800;
+}
+
+.login-box__secondary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
+
+
+.login-box__secondary button {
+  min-width: 0;
+  width: 100%;
+  min-height: 58px;
+  border: 1px solid #bcb3a5;
+  border-radius: 8px;
+  padding: 0 8px;
+  background: #ffffff;
+  color: var(--color-text);
+  font-size: 16px;
+}
+
+.benefit,
+.login-box,
+.club-intro,
+.benefits {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.benefit {
+  width: 100%;
+  overflow: hidden;
+}
