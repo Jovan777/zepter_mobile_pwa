@@ -1,0 +1,47 @@
+<article class="product-card">
+  <a class="product-card__media" [routerLink]="['/app/products', product.publicId]">
+    <img [src]="imageUrl" [alt]="product.name" />
+  </a>
+
+  <button
+    class="product-card__wishlist"
+    type="button"
+    aria-label="Dodaj u listu želja"
+    [class.product-card__wishlist--active]="isWishlisted"
+    (click)="toggleWishlist()"
+  >
+    {{ isWishlisted ? '♥' : '♡' }}
+  </button>
+
+  <a class="product-card__body" [routerLink]="['/app/products', product.publicId]">
+    <span class="product-card__category">{{ product.categoryName }}</span>
+
+    <h2>{{ product.name }}</h2>
+
+    <div class="product-card__code">
+      {{ product.code }}
+    </div>
+  </a>
+
+  <section class="product-card__prices">
+    <div class="product-card__price product-card__price--retail">
+      <span>MP cena</span>
+      <strong>{{ product.prices.retail | rsdCurrency }}</strong>
+    </div>
+
+    <div class="product-card__price product-card__price--club">
+      <span>
+        BizzClub
+        @if (product.discounts.clubMemberPercent > 0) {
+          <small>-{{ product.discounts.clubMemberPercent }}%</small>
+        }
+      </span>
+
+      <strong>{{ product.prices.clubMember | rsdCurrency }}</strong>
+    </div>
+  </section>
+
+  <button class="product-card__cart" type="button" aria-label="Dodaj u korpu" (click)="addToCart()">
+    🛒
+  </button>
+</article>

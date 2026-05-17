@@ -1,0 +1,28 @@
+<section class="price-stack">
+  <div class="price-stack__row price-stack__row--retail">
+    <span>Maloprodajna cena</span>
+    <strong>{{ product.prices.retail | rsdCurrency }}</strong>
+  </div>
+
+  <div class="price-stack__row price-stack__row--club">
+    <span>
+      BizzClub
+      @if (product.discounts.clubMemberPercent > 0) {
+        <small>-{{ product.discounts.clubMemberPercent }}%</small>
+      }
+    </span>
+
+    <strong>{{ product.prices.clubMember | rsdCurrency }}</strong>
+  </div>
+
+  <div class="price-stack__row price-stack__row--partner">
+    <span>
+      Partner
+      @if (product.discounts.clubPartnerPercent > 0) {
+        <small>-{{ product.discounts.clubPartnerPercent }}%</small>
+      }
+    </span>
+
+    <strong>{{ product.prices.clubPartner | rsdCurrency }}</strong>
+  </div>
+</section>

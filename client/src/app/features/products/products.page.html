@@ -1,0 +1,125 @@
+<section class="products-page mobile-page">
+  <header class="products-page__header">
+    <a class="products-page__back" routerLink="/app/categories" aria-label="Nazad na kategorije">
+      ←
+    </a>
+
+    <div>
+      <span>Kategorija</span>
+      <h1>{{ pageTitle() }}</h1>
+    </div>
+  </header>
+
+  <app-search-bar
+    placeholder="Unesite ključno slovo za pretragu..."
+    [value]="searchValue()"
+    (valueChange)="updateSearch($event)"
+  />
+
+  <section class="products-page__meta">
+    <span>{{ filteredProducts().length }} proizvoda</span>
+
+    @if (showOnlyNew() || showOnlyFeatured() || sortMode() !== 'default') {
+      <button type="button" (click)="resetFilters()">Poništi filtere</button>
+    }
+  </section>
+
+  @if (loading()) {
+    <section class="products-grid">
+      @for (item of [1, 2, 3, 4]; track item) {
+        <article class="product-skeleton"></article>
+      }
+    </section>
+  } @else if (errorMessage()) {
+    <section class="products-page__empty">
+      {{ errorMessage() }}
+    </section>
+  } @else if (filteredProducts().length === 0) {
+    <section class="products-page__empty">
+      Nema proizvoda za izabrane kriterijume.
+    </section>
+  } @else {
+    <section class="products-grid">
+      @for (product of filteredProducts(); track product.publicId) {
+        <app-product-card [product]="product" />
+      }
+    </section>
+  }
+
+  <button class="filter-fab" type="button" aria-label="Filteri" (click)="toggleFilter()">
+    ⌯
+  </button>
+
+  @if (filterOpen()) {
+    <button class="filter-backdrop" type="button" aria-label="Zatvori filtere" (click)="closeFilter()"></button>
+
+    <section class="filter-sheet">
+      <div class="filter-sheet__handle"></div>
+
+      <header>
+        <div>
+          <span>Filteri</span>
+          <h2>Prikaz proizvoda</h2>
+        </div>
+
+        <button type="button" (click)="closeFilter()">×</button>
+      </header>
+
+      <div class="filter-sheet__group">
+        <p>Sortiranje</p>
+
+        <div class="filter-sheet__buttons">
+          <button
+            type="button"
+            [class.active]="sortMode() === 'default'"
+            (click)="setSortMode('default')"
+          >
+            Preporučeno
+          </button>
+
+          <button
+            type="button"
+            [class.active]="sortMode() === 'priceAsc'"
+            (click)="setSortMode('priceAsc')"
+          >
+            Cena ↑
+          </button>
+
+          <button
+            type="button"
+            [class.active]="sortMode() === 'priceDesc'"
+            (click)="setSortMode('priceDesc')"
+          >
+            Cena ↓
+          </button>
+
+          <button
+            type="button"
+            [class.active]="sortMode() === 'nameAsc'"
+            (click)="setSortMode('nameAsc')"
+          >
+            Naziv
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-sheet__group">
+        <p>Brzi filteri</p>
+
+        <div class="filter-sheet__buttons">
+          <button type="button" [class.active]="showOnlyNew()" (click)="toggleOnlyNew()">
+            Novo
+          </button>
+
+          <button type="button" [class.active]="showOnlyFeatured()" (click)="toggleOnlyFeatured()">
+            Najprodavanije
+          </button>
+        </div>
+      </div>
+
+      <button class="filter-sheet__apply" type="button" (click)="closeFilter()">
+        Primeni filtere
+      </button>
+    </section>
+  }
+</section>

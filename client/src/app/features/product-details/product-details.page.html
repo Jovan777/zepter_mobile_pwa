@@ -1,0 +1,120 @@
+<section class="product-details mobile-page">
+  <header class="product-details__top">
+    <a routerLink="/app/categories" aria-label="Nazad">←</a>
+
+    <img src="/assets/images/logos/zepter-logo.png" alt="Zepter" />
+
+    <a routerLink="/app/cart" aria-label="Korpa">🛒</a>
+  </header>
+
+  @if (loading()) {
+    <section class="product-details__loading">
+      Učitavanje proizvoda...
+    </section>
+  } @else if (errorMessage()) {
+    <section class="product-details__error">
+      {{ errorMessage() }}
+    </section>
+  } @else if (product(); as item) {
+    <section class="product-gallery">
+      <div class="product-gallery__image">
+        <img [src]="activeImage()" [alt]="item.name" />
+      </div>
+
+      <div class="product-gallery__actions">
+        <button type="button" aria-label="Podeli proizvod" (click)="shareProduct()">⌯</button>
+
+        <div class="product-gallery__dots">
+          @for (image of item.images; track image; let index = $index) {
+            <button
+              type="button"
+              [class.active]="selectedImageIndex() === index"
+              (click)="selectImage(index)"
+            ></button>
+          }
+        </div>
+
+        <button
+          type="button"
+          aria-label="Lista želja"
+          [class.active]="isWishlisted()"
+          (click)="toggleWishlist()"
+        >
+          {{ isWishlisted() ? '♥' : '♡' }}
+        </button>
+      </div>
+    </section>
+
+    <section class="product-details__intro">
+      <span>{{ item.categoryName }}</span>
+      <h1>{{ item.name }}</h1>
+      <p>{{ item.code }}</p>
+    </section>
+
+    <app-price-stack [product]="item" />
+
+    @if (addedMessage()) {
+      <div class="product-details__toast">
+        {{ addedMessage() }}
+      </div>
+    }
+
+    <section class="product-tabs">
+      <button
+        type="button"
+        [class.active]="selectedTab() === 'description'"
+        (click)="selectTab('description')"
+      >
+        Opis
+      </button>
+
+      <button
+        type="button"
+        [class.active]="selectedTab() === 'details'"
+        (click)="selectTab('details')"
+      >
+        Detalji
+      </button>
+
+      <button
+        type="button"
+        [class.active]="selectedTab() === 'technical'"
+        (click)="selectTab('technical')"
+      >
+        Tehnički podaci
+      </button>
+    </section>
+
+    <section class="product-tab-content">
+      @if (selectedTab() === 'description') {
+        <p>{{ item.description || item.shortDescription }}</p>
+      }
+
+      @if (selectedTab() === 'details') {
+        <p>{{ item.presentation || item.historyDetails || item.shortDescription }}</p>
+      }
+
+      @if (selectedTab() === 'technical') {
+        <dl>
+          @for (detail of item.technicalDetails; track detail.label) {
+            <div>
+              <dt>{{ detail.label }}</dt>
+              <dd>{{ detail.value }}</dd>
+            </div>
+          }
+        </dl>
+      }
+    </section>
+
+    <footer class="product-buy-bar">
+      <div>
+        <span>BizzClub</span>
+        <strong>{{ item.prices.clubMember | rsdCurrency }}</strong>
+      </div>
+
+      <button type="button" (click)="addToCart()">
+        🛒 Dodaj u korpu
+      </button>
+    </footer>
+  }
+</section>

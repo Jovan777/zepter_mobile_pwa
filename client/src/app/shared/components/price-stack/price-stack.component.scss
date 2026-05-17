@@ -1,0 +1,62 @@
+.price-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.price-stack__row {
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  padding: 0 12px;
+}
+
+.price-stack__row span {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.price-stack__row strong {
+  color: var(--color-muted);
+  font-size: 17px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.price-stack__row small {
+  border-radius: 999px;
+  padding: 2px 6px;
+  background: #ffffff;
+  color: var(--color-gold-dark);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.price-stack__row--retail {
+  background: #eeeeee;
+}
+
+.price-stack__row--club {
+  background: rgba(225, 209, 179, 0.68);
+}
+
+.price-stack__row--club span,
+.price-stack__row--club strong,
+.price-stack__row--partner span,
+.price-stack__row--partner strong {
+  color: var(--color-gold-dark);
+}
+
+.price-stack__row--partner {
+  background: rgba(181, 151, 100, 0.18);
+}
