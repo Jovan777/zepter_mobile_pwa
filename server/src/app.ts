@@ -5,6 +5,7 @@ import { allowedOrigins } from './config/env';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware';
 
 import authRoutes from './modules/auth/auth.routes';
+import blogRoutes from './modules/blog/blog.routes';
 import cartRoutes from './modules/cart/cart.routes';
 import categoryRoutes from './modules/categories/category.routes';
 import clientRoutes from './modules/clients/client.routes';
@@ -48,6 +49,7 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/blog', blogRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/clients', clientRoutes);

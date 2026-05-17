@@ -1,0 +1,93 @@
+<section class="blog-page mobile-page">
+  <header class="blog-page__top">
+    <a class="blog-page__back" routerLink="/app/home" aria-label="Nazad">←</a>
+
+    <div>
+      <span>Zepter Mobile PWA</span>
+      <h1>Zepter Blog</h1>
+    </div>
+
+    <a class="blog-page__cart" routerLink="/app/cart" aria-label="Korpa">🛒</a>
+  </header>
+
+  <label class="blog-search">
+    <span>Pretraga</span>
+    <input
+      #searchInput
+      type="search"
+      placeholder="Pretražite blog..."
+      [value]="searchTerm()"
+      (input)="updateSearch(searchInput.value)"
+    />
+  </label>
+
+  <nav class="blog-chips" aria-label="Blog kategorije">
+    @for (chip of chips; track chip.key) {
+      <button
+        type="button"
+        [class.active]="selectedFilter() === chip.key"
+        (click)="setFilter(chip.key)"
+      >
+        {{ chip.label }}
+      </button>
+    }
+  </nav>
+
+  @if (errorMessage()) {
+    <p class="blog-message">{{ errorMessage() }}</p>
+  }
+
+  @if (loading()) {
+    <section class="blog-state">
+      <h2>Učitavanje bloga...</h2>
+    </section>
+  } @else if (filteredPosts().length === 0) {
+    <section class="blog-state">
+      <h2>Nema rezultata</h2>
+      <p>Promenite pretragu ili izaberite drugu kategoriju.</p>
+    </section>
+  } @else {
+    @if (featuredPost(); as featured) {
+      <article class="blog-featured" (click)="openPost(featured)">
+        <img [src]="imageUrl(featured.imageUrl)" [alt]="featured.title" />
+        <section>
+          <div class="blog-meta">
+            <span>{{ featured.category }}</span>
+            <small>{{ featured.monthLabel }}</small>
+          </div>
+          <h2>{{ featured.title }}</h2>
+          <p>{{ featured.excerpt }}</p>
+          <footer>
+            <span>{{ featured.author }}</span>
+            <a [routerLink]="['/app/blog', featured.slug]" (click)="$event.stopPropagation()">
+              Pročitaj više
+            </a>
+          </footer>
+        </section>
+      </article>
+    }
+
+    <section class="blog-list">
+      @for (post of listPosts(); track post.publicId) {
+        <article class="blog-card" (click)="openPost(post)">
+          <img [src]="imageUrl(post.imageUrl)" [alt]="post.title" />
+
+          <section>
+            <div class="blog-meta">
+              <span>{{ post.category }}</span>
+              <small>{{ post.monthLabel }}</small>
+            </div>
+            <h2>{{ post.title }}</h2>
+            <p>{{ post.excerpt }}</p>
+            <footer>
+              <span>{{ post.author }}</span>
+              <a [routerLink]="['/app/blog', post.slug]" (click)="$event.stopPropagation()">
+                Pročitaj više
+              </a>
+            </footer>
+          </section>
+        </article>
+      }
+    </section>
+  }
+</section>

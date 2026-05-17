@@ -1,0 +1,110 @@
+<section class="blog-details mobile-page">
+  <header class="blog-details__top">
+    <button type="button" aria-label="Nazad" (click)="goBack()">←</button>
+    <h1>{{ title() }}</h1>
+    <button type="button" aria-label="Podeli tekst" (click)="sharePost()">⌯</button>
+  </header>
+
+  @if (shareMessage()) {
+    <p class="blog-details__toast">{{ shareMessage() }}</p>
+  }
+
+  @if (loading()) {
+    <section class="blog-details__state">
+      <h2>Učitavanje teksta...</h2>
+    </section>
+  } @else if (errorMessage()) {
+    <section class="blog-details__state">
+      <h2>{{ errorMessage() }}</h2>
+      <button type="button" (click)="goBack()">Nazad na blog</button>
+    </section>
+  } @else if (post(); as article) {
+    <article class="article">
+      <img class="article__hero" [src]="imageUrl(article.imageUrl)" [alt]="article.title" />
+
+      <section class="article__intro">
+        <div class="article__meta">
+          <span>{{ article.category }}</span>
+          <small>{{ article.monthLabel }}</small>
+          <small>{{ article.author }}</small>
+        </div>
+
+        <h2>{{ article.title }}</h2>
+
+        @if (article.subtitle) {
+          <p>{{ article.subtitle }}</p>
+        }
+      </section>
+
+      <section class="article__content">
+        @for (block of article.content; track $index) {
+          @switch (block.type) {
+            @case ('heading') {
+              <h3>{{ block.text }}</h3>
+            }
+            @case ('quote') {
+              <blockquote>{{ block.text }}</blockquote>
+            }
+            @case ('list') {
+              <ul>
+                @for (item of block.items || []; track item) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            }
+            @default {
+              <p>{{ block.text }}</p>
+            }
+          }
+        }
+      </section>
+    </article>
+
+    @if (relatedProducts().length > 0) {
+      <section class="related-products">
+        <header>
+          <span>Zepter preporuka</span>
+          <h2>Preporučeni proizvodi</h2>
+        </header>
+
+        <div class="related-products__list">
+          @for (product of relatedProducts(); track product.publicId) {
+            <article class="related-card">
+              <a class="related-card__image" [routerLink]="['/app/products', product.publicId]">
+                <img [src]="imageUrl(product.images[0])" [alt]="product.name" />
+              </a>
+
+              <section>
+                <span>{{ product.categoryName }}</span>
+                <h3>{{ product.name }}</h3>
+                <small>{{ product.code }}</small>
+
+                <div class="related-card__prices">
+                  <div>
+                    <span>MP cena</span>
+                    <strong>{{ product.prices.retail | rsdCurrency }}</strong>
+                  </div>
+                  <div>
+                    <span>BizzClub</span>
+                    <strong>{{ product.prices.clubMember | rsdCurrency }}</strong>
+                  </div>
+                </div>
+
+                <footer>
+                  <a [routerLink]="['/app/products', product.publicId]">Pogledaj proizvod</a>
+                  <button type="button" (click)="addToCart(product)">
+                    @if (addedProductPublicId() === product.publicId) {
+                      Dodato
+                    } @else {
+                      Dodaj u korpu
+                    }
+                  </button>
+                </footer>
+              </section>
+            </article>
+          }
+        </div>
+      </section>
+    }
+  }
+</section>

@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import slugify from 'slugify';
 import { connectDB, disconnectDB } from '../config/db';
 import { env } from '../config/env';
+import { BlogPost } from '../modules/blog/blog.model';
 import { Category } from '../modules/categories/category.model';
 import { Client } from '../modules/clients/client.model';
 import { Offer } from '../modules/offers/offer.model';
@@ -19,6 +20,7 @@ function makeSlug(value: string): string {
 
 const image = (name: string) => `/assets/images/products/${name}`;
 const banner = (name: string) => `/assets/images/banners/${name}`;
+const blogImage = (name: string) => `/assets/images/blog/${name}`;
 
 const categories = [
   {
@@ -406,6 +408,216 @@ const wishlistItems = [
   }
 ];
 
+const blogPosts = [
+  {
+    publicId: 'BLOG-AIR-POLLUTION-SERBIA-2026',
+    slug: 'zagadjenje-u-srbiji-je-ozbiljnije-nego-sto-tumacenja-rezultata-prikazuju',
+    title: 'ZAGAĐENJE U SRBIJI JE OZBILJNIJE NEGO ŠTO TUMAČENJA REZULTATA PRIKAZUJU',
+    subtitle: 'Kvalitet vazduha u gradovima traži svakodnevnu pažnju, ne samo sezonsko praćenje.',
+    excerpt:
+      'Prema dostupnim podacima, broj gradova sa prekomernim zagađenjem vazduha pokazuje da problem počinje ranije nego što zvanična tumačenja često prikazuju.',
+    author: 'Zepter Srbija',
+    category: 'Zdravlje',
+    monthLabel: 'March 2026',
+    imageUrl: blogImage('18-gradova-zagadjenje-vazduh-zepter-danas-therapyair-myion-(2).png'),
+    content: [
+      {
+        type: 'paragraph',
+        text:
+          'Zagađenje vazduha u Srbiji više nije tema koja pripada samo najhladnijim danima u godini. Merenja sve češće pokazuju da povišene vrednosti počinju ranije, traju duže i utiču na svakodnevni ritam života u velikim i manjim gradovima.'
+      },
+      {
+        type: 'heading',
+        text: 'Problem počinje pre nego što ga primetimo'
+      },
+      {
+        type: 'paragraph',
+        text:
+          'Kada se govori o kvalitetu vazduha, javnost najčešće reaguje tek kada su koncentracije čestica već vidljivo visoke. Ipak, organizam je izložen i tokom dana kada zagađenje nije očigledno mirisom, maglom ili smogom.'
+      },
+      {
+        type: 'quote',
+        text:
+          'Zdraviji dom počinje od vazduha koji udišemo svakog dana, ne samo tokom perioda najvećeg zagađenja.'
+      },
+      {
+        type: 'list',
+        items: [
+          'Pratite kvalitet vazduha pre izlaska iz kuće.',
+          'Provetravajte prostor u periodima nižeg zagađenja.',
+          'Koristite prečišćivače vazduha u prostorijama u kojima najviše boravite.',
+          'Obratite pažnju na ličnu zaštitu tokom kretanja kroz zagađene zone.'
+        ]
+      },
+      {
+        type: 'paragraph',
+        text:
+          'Zepter TherapyAir i MyIon rešenja u POC aplikaciji pokazuju kako se tema zdravlja može povezati sa konkretnim proizvodima i jasnom edukacijom korisnika.'
+      }
+    ],
+    relatedProductPublicIds: ['PRD-THERAPYAIR-SMART', 'PRD-THERAPYAIR-ION', 'PRD-MYIONZ-PRO'],
+    isFeatured: true,
+    isPublished: true,
+    publishedAt: new Date('2026-03-18T09:00:00.000Z')
+  },
+  {
+    publicId: 'BLOG-MICROPLASTICS-WATER-2026',
+    slug: 'cestice-plastike-u-vodi-unos-distribucija-i-bioloski-efekti',
+    title: 'ČESTICE PLASTIKE U VODI: UNOS, DISTRIBUCIJA I BIOLOŠKI EFEKTI',
+    subtitle: 'Mikroplastika otvara nova pitanja o vodi koju pijemo svakog dana.',
+    excerpt:
+      'Mikroplastika i nanoplastika više nisu samo ekološko pitanje, već sve važnija tema zdravlja, svakodnevnog unosa i dugoročnog opterećenja organizma.',
+    author: 'Peđa Eraković',
+    category: 'Zdravlje',
+    monthLabel: 'March 2026',
+    imageUrl: blogImage('Microplastics-Mikroplastika-Zepter-EdelWasser-AqueenaEvo-(2).jpg'),
+    content: [
+      {
+        type: 'paragraph',
+        text:
+          'Mikroplastika nastaje raspadanjem većih plastičnih materijala, ali i direktnim oslobađanjem sitnih čestica iz ambalaže, tekstila i svakodnevnih proizvoda. Zbog veličine, ove čestice mogu dospeti u vodu, hranu i vazduh.'
+      },
+      {
+        type: 'heading',
+        text: 'Zašto je tema važna'
+      },
+      {
+        type: 'paragraph',
+        text:
+          'Savremena istraživanja sve više prate kako se sitne čestice ponašaju u organizmu, gde se mogu zadržati i kakve efekte mogu imati pri dugotrajnoj izloženosti. Iako nauka još razvija odgovore, preventivni pristup kvalitetu vode postaje razuman izbor.'
+      },
+      {
+        type: 'list',
+        items: [
+          'Mikroplastika može biti prisutna u flaširanoj i vodovodnoj vodi.',
+          'Nanoplastika je posebno važna zbog veoma malih dimenzija.',
+          'Kumulativna izloženost je često važnija od jednog pojedinačnog unosa.',
+          'Prečišćavanje vode je praktičan način da korisnik smanji deo svakodnevnog opterećenja.'
+        ]
+      },
+      {
+        type: 'paragraph',
+        text:
+          'Zepter EdelWasser i Aqueena rešenja predstavljaju temu vode kroz kontrolisaniji pristup kvalitetu i svakodnevnoj upotrebi u domu.'
+      }
+    ],
+    relatedProductPublicIds: ['PRD-EDEL-WASSER-GOLD', 'PRD-AQUEENA-THERMO-ECO'],
+    isFeatured: false,
+    isPublished: true,
+    publishedAt: new Date('2026-03-12T09:00:00.000Z')
+  },
+  {
+    publicId: 'BLOG-MYION-PERSONAL-AIR-2026',
+    slug: 'myion-licna-zona-cistog-vazduha-uz-svaki-korak',
+    title: 'MYION: LIČNA ZONA ČISTOG VAZDUHA UZ SVAKI KORAK',
+    subtitle: 'Nosiva zaštita za ritam grada, putovanja i svakodnevne obaveze.',
+    excerpt:
+      'MyIon uređaji stvaraju ličnu zonu čistijeg vazduha pomoću negativnih jona i namenjeni su svakodnevnoj zaštiti u pokretu.',
+    author: 'Peđa Eraković',
+    category: 'Zdravlje',
+    monthLabel: 'March 2026',
+    imageUrl: blogImage('MYION-MYIONZ-PRO-THERAPYAIR-VAZDUH-PRECISCIVAC-(2).png'),
+    content: [
+      {
+        type: 'paragraph',
+        text:
+          'Kada izlazimo iz doma, kvalitet vazduha više nije pod našom kontrolom. Gužve, javni prevoz, kancelarije i zatvoreni prostori stvaraju situacije u kojima korisnik želi dodatni osećaj zaštite.'
+      },
+      {
+        type: 'heading',
+        text: 'Lična zona vazduha'
+      },
+      {
+        type: 'paragraph',
+        text:
+          'MyIon i MyIonZ Pro su zamišljeni kao kompaktna rešenja koja prate korisnika tokom dana. U POC prezentaciji ova kategorija lepo pokazuje kako mobilna aplikacija može da objasni benefit proizvoda brzo i razumljivo.'
+      },
+      {
+        type: 'quote',
+        text:
+          'Najbolja tehnologija za svakodnevicu je ona koju korisnik lako ponese i stvarno koristi.'
+      },
+      {
+        type: 'list',
+        items: [
+          'Za odlazak na posao i kretanje kroz grad.',
+          'Za putovanja i zatvorene prostore.',
+          'Za korisnike koji žele dodatnu rutinu zaštite.',
+          'Kao dopuna kućnim prečišćivačima vazduha.'
+        ]
+      }
+    ],
+    relatedProductPublicIds: ['PRD-MYIONZ-PRO', 'PRD-THERAPYAIR-SMART'],
+    isFeatured: false,
+    isPublished: true,
+    publishedAt: new Date('2026-03-08T09:00:00.000Z')
+  },
+  {
+    publicId: 'BLOG-WATER-FILTRATION-PURIFICATION-2026',
+    slug: 'zabluda-o-vodi-filtracija-nije-isto-sto-i-preciscavanje',
+    title: 'ZABLUDA O VODI: FILTRACIJA NIJE ISTO ŠTO I PREČIŠĆAVANJE',
+    subtitle: 'Ukus vode nije isto što i njen sastav.',
+    excerpt:
+      'Filter može promeniti ukus vode, ali prečišćavanje menja njen sastav. Zepter sistemi EdelWasser i AqueenaEvo koriste pristup zasnovan na ozbiljnijoj kontroli kvaliteta vode.',
+    author: 'Peđa Eraković',
+    category: 'Zdravlje',
+    monthLabel: 'March 2026',
+    imageUrl: blogImage('filtracija-preciscavanje-EdelWasser-AqueenaEvo-Zepter-(2).png'),
+    content: [
+      {
+        type: 'paragraph',
+        text:
+          'Jedna od najčešćih zabluda o vodi je da je svaka filtrirana voda ujedno i prečišćena voda. U praksi, filtracija i prečišćavanje mogu imati potpuno različit domet, naročito kada govorimo o savremenim kontaminantima.'
+      },
+      {
+        type: 'heading',
+        text: 'Filtracija menja utisak, prečišćavanje menja sastav'
+      },
+      {
+        type: 'paragraph',
+        text:
+          'Jednostavni filteri često poboljšavaju ukus, miris ili bistrinu vode. To je korisno, ali ne znači da su uklonjeni rastvoreni metali, mikroplastika, nanoplastika, ostaci hemikalija ili druge supstance koje ne možemo videti golim okom.'
+      },
+      {
+        type: 'heading',
+        text: 'Reverzna osmoza kao ozbiljniji nivo kontrole'
+      },
+      {
+        type: 'paragraph',
+        text:
+          'Sistemi zasnovani na reverznoj osmozi koriste polupropusnu membranu i višestepeni proces kako bi se smanjilo prisustvo širokog spektra neželjenih materija. Zato se o njima govori kao o sistemima za prečišćavanje, a ne samo o filtraciji.'
+      },
+      {
+        type: 'list',
+        items: [
+          'Mikroplastika i nanoplastika su tema sve većeg interesovanja.',
+          'Teški metali mogu biti problem i kada voda deluje potpuno bistra.',
+          'Kumulativna izloženost malim količinama kroz vreme zaslužuje pažnju.',
+          'Kvalitet vode u domaćinstvu treba posmatrati kao svakodnevnu zdravstvenu naviku.'
+        ]
+      },
+      {
+        type: 'quote',
+        text:
+          'Voda koju pijemo svakog dana nije detalj. Ona je jedna od osnovnih tačaka dugoročne brige o organizmu.'
+      },
+      {
+        type: 'heading',
+        text: 'Zepter EdelWasser i AqueenaEvo'
+      },
+      {
+        type: 'paragraph',
+        text:
+          'Zepter sistemi EdelWasser i AqueenaEvo u POC aplikaciji služe kao jasan primer kako edukativni sadržaj može da vodi korisnika od problema ka konkretnom proizvodnom rešenju, bez agresivne prodaje i bez preopterećenja tehničkim detaljima.'
+      }
+    ],
+    relatedProductPublicIds: ['PRD-EDEL-WASSER-GOLD', 'PRD-AQUEENA-THERMO-ECO'],
+    isFeatured: true,
+    isPublished: true,
+    publishedAt: new Date('2026-03-01T09:00:00.000Z')
+  }
+];
+
 const clients = [
   {
     publicId: 'CL-DEMO-001',
@@ -468,13 +680,15 @@ async function runSeed(): Promise<void> {
       Region.deleteMany({}),
       Order.deleteMany({}),
       Offer.deleteMany({}),
-      Wishlist.deleteMany({})
+      Wishlist.deleteMany({}),
+      BlogPost.deleteMany({})
     ]);
   }
 
   await upsertByKey(Category, 'publicId', categories);
   await upsertByKey(Product, 'publicId', products.map((product) => ({ ...product, slug: makeSlug(product.name) })));
   await upsertByKey(ZepterClubPlan, 'code', plans);
+  await upsertByKey(BlogPost, 'publicId', blogPosts);
 
   const passwordHash = await bcrypt.hash('demo12345', 10);
   await User.updateOne(
