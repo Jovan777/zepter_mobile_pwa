@@ -1,0 +1,122 @@
+<section class="profile-page mobile-page">
+  <header class="profile-top">
+    <a routerLink="/app/home" aria-label="Nazad">←</a>
+
+    <h1>Moj profil</h1>
+
+    <a routerLink="/app/profile/settings" aria-label="Podešavanja">⚙</a>
+  </header>
+
+  @if (loading()) {
+    <section class="profile-loading">
+      Učitavanje profila...
+    </section>
+  } @else if (errorMessage()) {
+    <section class="profile-loading">
+      {{ errorMessage() }}
+    </section>
+  } @else if (user(); as currentUser) {
+    <section class="profile-card user-card">
+      <h2>{{ fullName() }}</h2>
+
+      <p>{{ currentUser.email }}</p>
+
+      <div class="user-card__row">
+        <span>BizzClub ID:</span>
+
+        <strong>{{ clubId() }}</strong>
+
+        <button type="button" aria-label="Kopiraj BizzClub ID" (click)="copyClubNumber()">
+          ⧉
+        </button>
+      </div>
+
+      <div class="user-card__divider"></div>
+
+      <div class="user-card__info">
+        <span>Preporučilac:</span>
+        <strong>{{ currentUser.recommenderCode || '-' }}</strong>
+      </div>
+
+      <div class="user-card__info">
+        <span>Broj kupca:</span>
+        <strong>{{ currentUser.customerCode || '-' }}</strong>
+      </div>
+    </section>
+
+    <section class="bizzclub-banner">
+      <div>
+        <h2>Zepter BizzClub</h2>
+        <p>Registrujte prijatelje i ostvarite pogodnosti kroz njihove kupovine.</p>
+      </div>
+
+      <span>Zepter<br />Bizz<br />Club</span>
+    </section>
+
+    <section class="club-card">
+      <div class="club-card__logo">
+        <img src="/assets/images/logos/zepter-logo.png" alt="Zepter" />
+        <span>BizzClub</span>
+      </div>
+
+      <h2>{{ fullName() }}</h2>
+
+      <p>{{ currentUser.marketingPlan.currentRank }}</p>
+
+      <strong>{{ clubId() }}</strong>
+    </section>
+
+    <section class="profile-month">
+      <span>Tekući Zepter mesec:</span>
+      <strong>ZM 1</strong>
+    </section>
+
+    <section class="profile-card status-card">
+      <h2>Trenutni status - {{ currentUser.marketingPlan.currentRank }}</h2>
+
+      <div class="status-card__row">
+        <span>Uspešno regrutovano:</span>
+        <strong>{{ invitedCount() }}/{{ currentUser.marketingPlan.invitedMembersCount }}</strong>
+      </div>
+
+      <div class="progress">
+        <span [style.width.%]="progressPercent()"></span>
+      </div>
+
+      <p>
+        Do sledećeg nivoa:
+        <strong>{{ currentUser.marketingPlan.nextRank }}</strong>
+      </p>
+    </section>
+
+    <section class="marketing-plan">
+      <span>Vaš marketing plan</span>
+
+      <a routerLink="/app/zepter-club">
+        <strong>RP</strong>
+        <b>›</b>
+      </a>
+
+      <a routerLink="/app/clients">
+        <strong>Učlanjeni korisnici</strong>
+        <b>{{ invitedCount() }} ›</b>
+      </a>
+    </section>
+
+    <section class="profile-card client-summary">
+      <div>
+        <span>Broj učlanjenih korisnika</span>
+        <strong>{{ invitedCount() }}</strong>
+      </div>
+
+      <div>
+        <span>Broj kupovina članova</span>
+        <strong>{{ clientsPurchasesCount() }}</strong>
+      </div>
+    </section>
+
+    <button class="delete-account" type="button">
+      Zahtev za brisanje naloga
+    </button>
+  }
+</section>

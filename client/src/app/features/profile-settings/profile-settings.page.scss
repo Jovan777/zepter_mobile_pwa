@@ -1,0 +1,121 @@
+.settings-page {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  background: #eeeeee;
+}
+
+.settings-top {
+  min-height: 46px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-top a {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--color-text);
+  font-size: 24px;
+}
+
+.settings-top h1 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 18px;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.settings-loading,
+.settings-card {
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.settings-loading {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  color: var(--color-muted);
+}
+
+.settings-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.settings-card h2 {
+  margin: 0 0 4px;
+  color: var(--color-muted);
+  font-size: 14px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.settings-message {
+  margin: 0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: rgba(62, 138, 204, 0.09);
+  color: var(--color-blue-dark);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.settings-card label {
+  display: grid;
+  gap: 5px;
+}
+
+.settings-card label span {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.settings-card input,
+.settings-card select {
+  width: 100%;
+  min-height: 50px;
+  border: 1px solid #cfcfcf;
+  border-radius: 9px;
+  padding: 0 12px;
+  background: #ffffff;
+  color: var(--color-text);
+  outline: none;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.settings-card input:disabled {
+  background: #eeeeee;
+  color: var(--color-muted);
+}
+
+.phone-group {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.settings-card button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 9px;
+  background: #000000;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.settings-card button:disabled {
+  opacity: 0.65;
+}

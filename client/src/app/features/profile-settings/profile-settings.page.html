@@ -1,0 +1,113 @@
+<section class="settings-page mobile-page">
+  <header class="settings-top">
+    <a routerLink="/app/profile" aria-label="Nazad">←</a>
+    <h1>Podešavanja</h1>
+  </header>
+
+  @if (loading()) {
+    <section class="settings-loading">
+      Učitavanje podešavanja...
+    </section>
+  } @else {
+    <section class="settings-card">
+      <h2>Korisničke informacije</h2>
+
+      @if (message()) {
+        <p class="settings-message">{{ message() }}</p>
+      }
+
+      <label>
+        <span>Ime</span>
+        <input
+          type="text"
+          [value]="form().firstName"
+          (input)="updateField('firstName', $any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>Prezime</span>
+        <input
+          type="text"
+          [value]="form().lastName"
+          (input)="updateField('lastName', $any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>Država</span>
+        <select [value]="form().country" (change)="updateField('country', $any($event.target).value)">
+          <option value="Republika Srbija">Republika Srbija</option>
+          <option value="Crna Gora">Crna Gora</option>
+          <option value="Bosna i Hercegovina">Bosna i Hercegovina</option>
+          <option value="Kazakhstan">Kazakhstan</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Adresa</span>
+        <input
+          type="text"
+          [value]="form().street"
+          (input)="updateField('street', $any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>Poštanski broj</span>
+        <input
+          type="text"
+          [value]="form().postalCode"
+          (input)="updateField('postalCode', $any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>Grad</span>
+        <input
+          type="text"
+          [value]="form().city"
+          (input)="updateField('city', $any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>Email</span>
+        <input
+          type="email"
+          [value]="form().email"
+          (input)="updateField('email', $any($event.target).value)"
+        />
+      </label>
+
+      <div class="phone-group">
+        <label>
+          <span>Pozivni</span>
+          <input
+            type="text"
+            [value]="form().phonePrefix"
+            (input)="updateField('phonePrefix', $any($event.target).value)"
+          />
+        </label>
+
+        <label>
+          <span>Telefon</span>
+          <input
+            type="tel"
+            [value]="form().phone"
+            (input)="updateField('phone', $any($event.target).value)"
+          />
+        </label>
+      </div>
+
+      <label>
+        <span>BizzClub ID</span>
+        <input type="text" [value]="form().clubNumber" disabled />
+      </label>
+
+      <button type="button" [disabled]="saving()" (click)="saveProfile()">
+        {{ saving() ? 'Čuvanje...' : 'Ažuriraj profil' }}
+      </button>
+    </section>
+  }
+</section>

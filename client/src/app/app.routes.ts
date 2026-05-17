@@ -78,6 +78,13 @@ export const routes: Routes = [
           import('./features/zepter-club/zepter-club.page').then((m) => m.ZepterClubPage)
       },
       {
+        path: 'profile/settings',
+        loadComponent: () =>
+          import('./features/profile-settings/profile-settings.page').then(
+            (m) => m.ProfileSettingsPage
+          )
+      },
+      {
         path: 'profile',
         loadComponent: () =>
           import('./features/profile/profile.page').then((m) => m.ProfilePage)

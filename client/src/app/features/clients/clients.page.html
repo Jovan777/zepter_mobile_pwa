@@ -1,0 +1,156 @@
+<section class="clients-page mobile-page">
+  <header class="clients-top">
+    @if (view() === 'overview') {
+      <a routerLink="/app/profile" aria-label="Nazad">←</a>
+    } @else {
+      <button type="button" aria-label="Nazad" (click)="setView('overview')">←</button>
+    }
+
+    <h1>
+      @if (view() === 'overview') {
+        Učlanjeni korisnici
+      } @else if (view() === 'sent') {
+        Poslate pozivnice
+      } @else {
+        Članovi kluba
+      }
+    </h1>
+  </header>
+
+  @if (loading()) {
+    <section class="clients-loading">
+      Učitavanje korisnika...
+    </section>
+  } @else {
+    @if (view() === 'overview') {
+      <section class="clients-hero">
+        <div class="clients-hero__icon">👥</div>
+
+        <div>
+          <strong>{{ invitedCount() }} učlanjenih korisnika</strong>
+          <span>BizzClub</span>
+        </div>
+      </section>
+
+      <section class="clients-menu">
+        <button type="button" (click)="setView('sent')">
+          <span class="clients-menu__badge clients-menu__badge--gray">
+            {{ sentInvitations().length }}
+          </span>
+
+          <strong>Poslate pozivnice</strong>
+
+          <b>›</b>
+        </button>
+
+        <button type="button" (click)="setView('clients')">
+          <span class="clients-menu__badge">
+            {{ clubClients().length }}
+          </span>
+
+          <strong>Moji klijenti</strong>
+
+          <b>›</b>
+        </button>
+      </section>
+    }
+
+    @if (view() === 'sent') {
+      <section class="clients-activity">
+        <div class="clients-hero__icon">👥</div>
+
+        <div>
+          <strong>Aktivnost za tekući ZM</strong>
+          <span>{{ sentInvitations().length }} pozivnica poslato</span>
+          <span>{{ clubClients().length }} članova kluba regrutovano</span>
+        </div>
+      </section>
+
+      @if (sentInvitations().length === 0) {
+        <section class="clients-empty">
+          Trenutno nema poslatih pozivnica.
+        </section>
+      } @else {
+        <section class="client-list">
+          @for (client of sentInvitations(); track client.publicId) {
+            <article class="client-row">
+              <span class="client-row__avatar">↗</span>
+
+              <div>
+                <strong>{{ client.firstName }} {{ client.lastName }}</strong>
+                <p>{{ client.email || client.phone }}</p>
+                <small>Status: pozivnica poslata</small>
+              </div>
+            </article>
+          }
+        </section>
+      }
+    }
+
+    @if (view() === 'clients') {
+      <section class="clients-activity">
+        <div class="clients-hero__icon">👥</div>
+
+        <div>
+          <strong>Aktivnost za tekući ZM</strong>
+          <span>{{ clubClients().length }} članova kluba regrutovano</span>
+          <span>Ukupan promet: {{ totalTurnover() | number: '1.0-0' }} RSD</span>
+        </div>
+      </section>
+
+      <section class="client-tabs">
+        <button
+          type="button"
+          [class.active]="purchaseTab() === 'withPurchases'"
+          (click)="setPurchaseTab('withPurchases')"
+        >
+          Članovi sa kupovinama
+        </button>
+
+        <button
+          type="button"
+          [class.active]="purchaseTab() === 'withoutPurchases'"
+          (click)="setPurchaseTab('withoutPurchases')"
+        >
+          Članovi bez kupovina
+        </button>
+      </section>
+
+      <section class="client-total">
+        <span>
+          @if (purchaseTab() === 'withPurchases') {
+            Članovi sa kupovinama
+          } @else {
+            Članovi bez kupovina
+          }
+        </span>
+
+        <strong>{{ activeClientList().length }}</strong>
+      </section>
+
+      @if (activeClientList().length === 0) {
+        <section class="clients-empty">
+          Nema korisnika u izabranoj kategoriji.
+        </section>
+      } @else {
+        <section class="client-list">
+          @for (client of activeClientList(); track client.publicId) {
+            <article class="client-row">
+              <span class="client-row__avatar">€</span>
+
+              <div>
+                <strong>{{ client.totalTurnover | number: '1.2-2' }} RSD iz {{ client.firstName }} {{ client.lastName }}</strong>
+                <p>Email: {{ client.email || '-' }}</p>
+                <p>Mobilni telefon: {{ client.phone || '-' }}</p>
+
+                @if (client.lastPurchaseAt) {
+                  <small>{{ client.lastPurchaseAt | date: 'yyyy-MM-dd' }}</small>
+                }
+              </div>
+            </article>
+          }
+        </section>
+      }
+    }
+  }
+</section>
