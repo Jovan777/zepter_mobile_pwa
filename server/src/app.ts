@@ -13,6 +13,7 @@ import orderRoutes from './modules/orders/order.routes';
 import productRoutes from './modules/products/product.routes';
 import regionRoutes from './modules/regions/region.routes';
 import userRoutes from './modules/users/user.routes';
+import wishlistRoutes from './modules/wishlist/wishlist.routes';
 import zepterClubRoutes from './modules/zepter-club/zepterClub.routes';
 
 export const app = express();
@@ -55,6 +56,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/regions', regionRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/zepter-club', zepterClubRoutes);
 
 app.use(notFoundHandler);

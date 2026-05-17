@@ -33,6 +33,12 @@ export class ApiService {
       .pipe(map((response) => response.data));
   }
 
+  delete<T>(endpoint: string): Observable<T> {
+    return this.http
+      .delete<ApiResponse<T>>(`${this.apiUrl}${endpoint}`)
+      .pipe(map((response) => response.data));
+  }
+
   private buildParams(query?: Record<string, QueryValue>): HttpParams {
     let params = new HttpParams();
 

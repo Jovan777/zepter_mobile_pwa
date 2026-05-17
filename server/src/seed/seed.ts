@@ -9,6 +9,7 @@ import { Order } from '../modules/orders/order.model';
 import { Product } from '../modules/products/product.model';
 import { Region } from '../modules/regions/region.model';
 import { User } from '../modules/users/user.model';
+import { Wishlist } from '../modules/wishlist/wishlist.model';
 import { ZepterClubPlan } from '../modules/zepter-club/zepterClub.model';
 import { createPublicId } from '../utils/publicId';
 
@@ -387,6 +388,24 @@ const demoUser = {
   isActive: true
 };
 
+const wishlistItems = [
+  {
+    publicId: 'WIS-DEMO-MYIONZ-PRO',
+    userPublicId: demoUser.publicId,
+    productPublicId: 'PRD-MYIONZ-PRO'
+  },
+  {
+    publicId: 'WIS-DEMO-THERAPYAIR-SMART',
+    userPublicId: demoUser.publicId,
+    productPublicId: 'PRD-THERAPYAIR-SMART'
+  },
+  {
+    publicId: 'WIS-DEMO-BIOPTRON-MEDALL',
+    userPublicId: demoUser.publicId,
+    productPublicId: 'PRD-BIOPTRON-MEDALL'
+  }
+];
+
 const clients = [
   {
     publicId: 'CL-DEMO-001',
@@ -448,7 +467,8 @@ async function runSeed(): Promise<void> {
       Client.deleteMany({}),
       Region.deleteMany({}),
       Order.deleteMany({}),
-      Offer.deleteMany({})
+      Offer.deleteMany({}),
+      Wishlist.deleteMany({})
     ]);
   }
 
@@ -464,6 +484,17 @@ async function runSeed(): Promise<void> {
   );
 
   await upsertByKey(Client, 'publicId', clients);
+
+  for (const item of wishlistItems) {
+    await Wishlist.updateOne(
+      {
+        userPublicId: item.userPublicId,
+        productPublicId: item.productPublicId
+      },
+      { $setOnInsert: item },
+      { upsert: true }
+    );
+  }
 
   await Region.updateOne(
     { code: 'RS' },

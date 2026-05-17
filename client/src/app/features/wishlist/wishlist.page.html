@@ -1,0 +1,93 @@
+<section class="wishlist-page mobile-page">
+  <header class="wishlist-page__top">
+    <a class="wishlist-page__back" routerLink="/app/categories" aria-label="Nazad">
+      ←
+    </a>
+
+    <div>
+      <span>Zepter Mobile PWA</span>
+      <h1>Lista želja</h1>
+    </div>
+
+    <a class="wishlist-page__cart" routerLink="/app/cart" aria-label="Korpa">
+      🛒
+    </a>
+  </header>
+
+  @if (message()) {
+    <p class="wishlist-message">{{ message() }}</p>
+  }
+
+  @if (loading()) {
+    <section class="wishlist-state">
+      <h2>Učitavanje liste želja...</h2>
+    </section>
+  } @else if (!hasProducts()) {
+    <section class="wishlist-empty">
+      <div class="wishlist-empty__icon">♡</div>
+
+      @if (isGuest()) {
+        <h2>Lista želja je prazna</h2>
+        <p>Sačuvajte proizvode iz kataloga ili se prijavite da lista bude dostupna na vašem nalogu.</p>
+      } @else {
+        <h2>Lista želja je prazna</h2>
+        <p>Dodajte omiljene proizvode iz kataloga i brzo im se vratite kasnije.</p>
+      }
+
+      <button type="button" (click)="goToCatalog()">Idi u katalog</button>
+    </section>
+  } @else {
+    <section class="wishlist-grid">
+      @for (product of products(); track product.productPublicId) {
+        <article class="wishlist-card">
+          <a class="wishlist-card__image" [routerLink]="['/app/products', product.productPublicId]">
+            <img [src]="imageUrl(product.imageUrl)" [alt]="product.name" />
+          </a>
+
+          <button
+            class="wishlist-card__remove"
+            type="button"
+            aria-label="Ukloni iz liste želja"
+            (click)="removeProduct(product)"
+          >
+            ♥
+          </button>
+
+          <section class="wishlist-card__content">
+            <span class="wishlist-card__category">{{ product.categoryName }}</span>
+            <h2>{{ product.name }}</h2>
+            <small>{{ product.code }}</small>
+
+            <div class="wishlist-card__prices">
+              <div>
+                <span>MP cena</span>
+                <strong>{{ product.prices.retail | rsdCurrency }}</strong>
+              </div>
+
+              <div class="wishlist-card__club">
+                <span>
+                  BizzClub
+                  @if ((product.discounts?.clubMemberPercent || 0) > 0) {
+                    <small>-{{ product.discounts?.clubMemberPercent }}%</small>
+                  }
+                </span>
+                <strong>{{ product.prices.clubMember | rsdCurrency }}</strong>
+              </div>
+            </div>
+          </section>
+
+          <footer class="wishlist-card__actions">
+            <a [routerLink]="['/app/products', product.productPublicId]">Detalji</a>
+            <button type="button" (click)="addToCart(product)">
+              @if (addedProductId() === product.productPublicId) {
+                Dodato
+              } @else {
+                Dodaj u korpu
+              }
+            </button>
+          </footer>
+        </article>
+      }
+    </section>
+  }
+</section>
