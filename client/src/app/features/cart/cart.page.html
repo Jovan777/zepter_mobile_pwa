@@ -1,0 +1,189 @@
+<section class="cart-page mobile-page">
+  <header class="cart-page__top">
+    <a class="cart-page__back" routerLink="/app/categories" aria-label="Nazad">
+      ←
+    </a>
+
+    <div>
+      <span>{{ modeLabel() }}</span>
+      <h1>Korpa</h1>
+    </div>
+
+    <button class="cart-page__clear" type="button" aria-label="Isprazni korpu" (click)="clearCart()">
+      🗑
+    </button>
+  </header>
+
+  @if (!hasItems()) {
+    <section class="cart-empty">
+      <div class="cart-empty__icon">🛒</div>
+      <h2>Vaša korpa je prazna</h2>
+      <p>Dodajte proizvode iz kataloga kako biste nastavili ka poručivanju.</p>
+      <button type="button" (click)="goToCatalog()">Idi u katalog</button>
+    </section>
+  } @else {
+    @if (message()) {
+      <p class="cart-message">{{ message() }}</p>
+    }
+
+    <section class="cart-items">
+      @for (item of cart()?.items || []; track item.productPublicId) {
+        <article class="cart-item">
+          <div class="cart-item__image">
+            <img [src]="imageUrl(item.imageUrl)" [alt]="item.name" />
+          </div>
+
+          <section class="cart-item__content">
+            <div class="cart-item__head">
+              <div>
+                <span>{{ item.categoryName }}</span>
+                <h2>{{ item.name }}</h2>
+                <small>{{ item.code }}</small>
+              </div>
+
+              <button type="button" aria-label="Ukloni proizvod" (click)="removeItem(item)">
+                🗑
+              </button>
+            </div>
+
+            <div class="cart-item__middle">
+              <div class="quantity">
+                <button type="button" (click)="decreaseQuantity(item)">−</button>
+                <strong>{{ item.quantity }}</strong>
+                <button type="button" (click)="increaseQuantity(item)">+</button>
+              </div>
+
+              <div class="cart-item__prices">
+                <div>
+                  <span>MP cena</span>
+                  <strong>{{ item.unitPrices.retail | rsdCurrency }}</strong>
+                </div>
+
+                <div class="cart-item__club">
+                  <span>BizzClub</span>
+                  <strong>{{ item.unitPrices.clubMember | rsdCurrency }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <footer class="cart-item__total">
+              <span>Ukupna cena</span>
+              <strong>{{ item.lineTotals.selected | rsdCurrency }}</strong>
+            </footer>
+          </section>
+        </article>
+      }
+    </section>
+
+    @if (cart(); as currentCart) {
+      <section class="cart-summary">
+        <header>
+          <span class="cart-summary__icon">🛒</span>
+          <h2>Korpa</h2>
+        </header>
+
+        <div class="cart-summary__rows">
+          <div>
+            <span>Maloprodajna cena</span>
+            <strong>{{ currentCart.totals.retailSubtotal | rsdCurrency }}</strong>
+          </div>
+
+          <div class="cart-summary__saving">
+            <span>BizzClub pogodnost</span>
+            <strong>-{{ savings() | rsdCurrency }}</strong>
+          </div>
+
+          <div>
+            <span>Dostava</span>
+            <strong>
+              @if (currentCart.totals.deliveryFee === 0) {
+                Besplatno
+              } @else {
+                {{ currentCart.totals.deliveryFee | rsdCurrency }}
+              }
+            </strong>
+          </div>
+        </div>
+
+        <div class="cart-summary__total">
+          <span>Ukupno</span>
+          <strong>{{ currentCart.totals.grandTotal | rsdCurrency }}</strong>
+        </div>
+
+        <label class="promo">
+          <span>Promo kod</span>
+
+          <div>
+            <input type="text" placeholder="Unosi se u završnom koraku" disabled />
+            <button type="button" disabled>→</button>
+          </div>
+        </label>
+      </section>
+
+      <section class="discount-plan">
+        <h2>Uživajte u progresivnoj skali pogodnosti</h2>
+        <p>Vaš trenutni BizzClub nivo zavisi od vrednosti kupovine i statusa korisnika.</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Vrednost kupovine</th>
+              <th>Pogodnost</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>10 €</td>
+              <td>-5% DL1</td>
+            </tr>
+            <tr>
+              <td>100 €</td>
+              <td>-10% DL2</td>
+            </tr>
+            <tr>
+              <td>1.500 €</td>
+              <td>-15% DL3</td>
+            </tr>
+            <tr>
+              <td>3.000 €</td>
+              <td>-20% DL4</td>
+            </tr>
+            <tr>
+              <td>6.000 €</td>
+              <td>-25% DL5</td>
+            </tr>
+            <tr>
+              <td>15.000 €</td>
+              <td>-30% DL6</td>
+            </tr>
+            <tr>
+              <td>30.000 €</td>
+              <td>-35% DL7</td>
+            </tr>
+            <tr>
+              <td>40.000 €</td>
+              <td>-40% DL8</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <strong>Mir pogodnosti BizzClub!</strong>
+      </section>
+
+      <footer class="cart-actions">
+        <button class="cart-actions__secondary" type="button" (click)="goToCatalog()">
+          Vrati se u katalog
+        </button>
+
+        <button class="cart-actions__primary" type="button" [disabled]="loading()" (click)="goToCheckout()">
+          @if (mode() === 'OFFERING') {
+            Slanje ponude
+          } @else {
+            Placanje
+          }
+        </button>
+      </footer>
+    }
+  }
+</section>

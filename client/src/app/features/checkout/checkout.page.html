@@ -1,0 +1,388 @@
+<section class="checkout-page mobile-page">
+  <header class="checkout-page__top">
+    <button type="button" aria-label="Nazad" (click)="goBack()">←</button>
+
+    <div>
+      <span>
+        @if (step() === 'buyer') {
+          Detalji
+        } @else if (step() === 'payment') {
+          Plaćanje
+        } @else if (step() === 'review') {
+          Potvrda
+        } @else {
+          Završeno
+        }
+      </span>
+
+      <h1>Podaci za plaćanje</h1>
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <p class="checkout-error">{{ errorMessage() }}</p>
+  }
+
+  @if (step() === 'buyer') {
+    <section class="checkout-card buyer-form">
+      <h2>Detalji kupca</h2>
+
+      <label>
+        <span>Ime *</span>
+        <input
+          type="text"
+          [value]="form().firstName"
+          (input)="updateField('firstName', $any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>Prezime *</span>
+        <input
+          type="text"
+          [value]="form().lastName"
+          (input)="updateField('lastName', $any($event.target).value)"
+        />
+      </label>
+
+      
+
+      <label>
+        <span>Država *</span>
+        <select [value]="form().country" (change)="updateField('country', $any($event.target).value)">
+          <option value="Republika Srbija">Republika Srbija</option>
+          <option value="Kazakhstan">Kazakhstan</option>
+          <option value="Crna Gora">Crna Gora</option>
+          <option value="Bosna i Hercegovina">Bosna i Hercegovina</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Adresa *</span>
+        <input
+          type="text"
+          [value]="form().address"
+          (input)="updateField('address', $any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>Poštanski broj</span>
+        <input
+          type="text"
+          [value]="form().postalCode"
+          (input)="updateField('postalCode', $any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>Grad *</span>
+        <input
+          type="text"
+          [value]="form().city"
+          (input)="updateField('city', $any($event.target).value)"
+        />
+      </label>
+
+      <div class="phone-row">
+        <label>
+          <span>Pozivni</span>
+          <input
+            type="text"
+            [value]="form().phonePrefix"
+            (input)="updateField('phonePrefix', $any($event.target).value)"
+          />
+        </label>
+
+        <label>
+          <span>Telefon *</span>
+          <input
+            type="tel"
+            [value]="form().phone"
+            (input)="updateField('phone', $any($event.target).value)"
+          />
+        </label>
+      </div>
+
+      <label>
+        <span>Email *</span>
+        <input
+          type="email"
+          [value]="form().email"
+          (input)="updateField('email', $any($event.target).value)"
+        />
+      </label>
+
+      
+
+      <p class="buyer-form__hint">
+        Unesite broj telefona ili email partnera BizzClub koji vas je preporučio.
+      </p>
+
+      <label class="switch-row">
+        <input
+          type="checkbox"
+          [checked]="form().pickupFromOffice"
+          (change)="updateField('pickupFromOffice', $any($event.target).checked)"
+        />
+
+        <span>Samopreuzimanje iz Zepter kancelarije</span>
+      </label>
+
+      <button class="checkout-primary" type="button" (click)="goToPayment()">
+        Pređi na plaćanje
+      </button>
+    </section>
+  }
+
+  @if (step() === 'payment') {
+    <section class="checkout-card payment-step">
+      <div class="payment-tabs">
+        <button
+          type="button"
+          [class.active]="paymentMethod() === 'CARD'"
+          (click)="selectPayment('CARD')"
+        >
+          Kartica
+        </button>
+
+        <button
+          type="button"
+          [class.active]="paymentMethod() === 'PAYMENT_SLIP'"
+          (click)="selectPayment('PAYMENT_SLIP')"
+        >
+          Bankovni prenos
+        </button>
+      </div>
+
+      <h2>Način plaćanja</h2>
+
+      <div class="payment-options">
+        @for (option of paymentOptions; track option.value) {
+          <button
+            type="button"
+            [class.active]="paymentMethod() === option.value"
+            (click)="selectPayment(option.value)"
+          >
+            <span>{{ paymentMethod() === option.value ? '◉' : '○' }}</span>
+
+            <div>
+              <strong>{{ option.title }}</strong>
+              <small>{{ option.description }}</small>
+            </div>
+          </button>
+        }
+      </div>
+
+      <button class="checkout-primary" type="button" (click)="goToReview()">
+        Napred
+      </button>
+    </section>
+  }
+
+  @if (step() === 'review') {
+    <section class="review">
+      <section class="review-block">
+        <header>
+          <span>Informacija o kupcu</span>
+          <button type="button" (click)="step.set('buyer')">✎</button>
+        </header>
+
+        <dl>
+          <div>
+            <dt>Ime</dt>
+            <dd>{{ form().firstName }} {{ form().lastName }}</dd>
+          </div>
+
+          <div>
+            <dt>Telefon</dt>
+            <dd>{{ form().phonePrefix }}{{ form().phone }}</dd>
+          </div>
+
+          <div>
+            <dt>Email</dt>
+            <dd>{{ form().email }}</dd>
+          </div>
+
+          <div>
+            <dt>Adresa</dt>
+            <dd>{{ form().address }}</dd>
+          </div>
+
+          <div>
+            <dt>Grad</dt>
+            <dd>{{ form().city }}</dd>
+          </div>
+
+          <div>
+            <dt>Država</dt>
+            <dd>{{ form().country }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="review-block">
+        <header>
+          <span>Način plaćanja</span>
+          <button type="button" (click)="step.set('payment')">✎</button>
+        </header>
+
+        <p>
+          @if (paymentMethod() === 'CARD') {
+            Plaćanje karticom online
+          } @else if (paymentMethod() === 'PAYMENT_SLIP') {
+            Bankovni prenos
+          } @else if (paymentMethod() === 'CASH_ON_DELIVERY') {
+            Plaćanje pouzećem
+          } @else {
+            Plaćanje rata unapred
+          }
+        </p>
+      </section>
+
+      <section class="review-block">
+        <header>
+          <span>Vaš porudžbina</span>
+        </header>
+
+        <div class="review-products">
+          @for (item of cart()?.items || []; track item.productPublicId) {
+            <article class="review-product">
+              <img [src]="imageUrl(item.imageUrl)" [alt]="item.name" />
+
+              <div>
+                <span>{{ item.categoryName }}</span>
+                <strong>{{ item.name }}</strong>
+                <small>{{ item.code }}</small>
+              </div>
+
+              <b>{{ item.quantity }}</b>
+            </article>
+          }
+        </div>
+      </section>
+
+      @if (cart(); as currentCart) {
+        <section class="review-total">
+          <div>
+            <span>Maloprodajna cena</span>
+            <strong>{{ currentCart.totals.retailSubtotal | rsdCurrency }}</strong>
+          </div>
+
+          <div>
+            <span>BizzClub pogodnost</span>
+            <strong>-{{ savings() | rsdCurrency }}</strong>
+          </div>
+
+          <div>
+            <span>Dostava</span>
+            <strong>
+              @if (currentCart.totals.deliveryFee === 0) {
+                Besplatno
+              } @else {
+                {{ currentCart.totals.deliveryFee | rsdCurrency }}
+              }
+            </strong>
+          </div>
+
+          <div class="review-total__final">
+            <span>Ukupno</span>
+            <strong>{{ currentCart.totals.grandTotal | rsdCurrency }}</strong>
+          </div>
+        </section>
+      }
+
+      <section class="review-extra">
+        <label>
+          <span>Promo kod</span>
+          <input
+            type="text"
+            placeholder="Unesite promo kod"
+            [value]="form().promoCode"
+            (input)="updateField('promoCode', $any($event.target).value)"
+          />
+        </label>
+
+        <label>
+          <span>Komentar</span>
+          <textarea
+            placeholder="Komentar"
+            [value]="form().comment"
+            (input)="updateField('comment', $any($event.target).value)"
+          ></textarea>
+        </label>
+      </section>
+
+      <section class="captcha-box">
+        <header>
+          <span>Provera potpisa</span>
+          <button type="button" (click)="refreshCaptcha()">Osveži</button>
+        </header>
+
+        <div class="captcha-box__image">
+          {{ captchaCode() }}
+        </div>
+
+        <input
+          type="text"
+          placeholder="Prepišite kod sa slike"
+          [value]="captchaInput()"
+          (input)="updateCaptchaInput($any($event.target).value)"
+        />
+      </section>
+
+      <button class="checkout-submit" type="button" [disabled]="loading()" (click)="submitOrder()">
+        {{ loading() ? 'Slanje...' : 'Pošalji porudžbinu' }}
+      </button>
+    </section>
+  }
+
+  @if (step() === 'success') {
+  <section class="order-success">
+    <div class="order-success__modal">
+      <div class="order-success__logo">
+        <img src="/assets/images/logos/zepter-logo.png" alt="Zepter" />
+      </div>
+
+      <div class="order-success__check">
+        ✓
+      </div>
+
+      <span class="order-success__eyebrow">Porudžbina je potvrđena</span>
+
+      <h2>Hvala vam!</h2>
+
+      <p>
+        Vaša porudžbina je uspešno poslata i evidentirana u sistemu.
+      </p>
+
+      <div class="order-success__number">
+        <span>Broj porudžbine</span>
+        <strong>{{ createdOrderPublicId() }}</strong>
+      </div>
+
+      <div class="order-success__info">
+        <p>
+          Potvrda porudžbine i dalji koraci biće prikazani u okviru vašeg naloga.
+        </p>
+      </div>
+
+      <div class="order-success__actions">
+        <a class="order-success__primary" routerLink="/app/home">
+          Nazad na početnu
+        </a>
+
+        @if (authService.isLoggedIn()) {
+          <a class="order-success__secondary" routerLink="/app/orders">
+            Moje porudžbine
+          </a>
+        } @else {
+          <a class="order-success__secondary" routerLink="/app/categories">
+            Nastavi kupovinu
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+}
+</section>
