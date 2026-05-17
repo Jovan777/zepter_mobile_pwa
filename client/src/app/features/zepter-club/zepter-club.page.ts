@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService, RegisterZepterClubPayload } from '../../core/services/auth.service';
 import { ClientService } from '../../core/services/client.service';
 
 type BenefitSectionId = 'discounts' | 'invite' | 'sell';
@@ -23,9 +23,24 @@ interface InviteForm {
   captchaInput: string;
 }
 
+interface RegistrationForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phonePrefix: string;
+  phone: string;
+  country: string;
+  city: string;
+  address: string;
+  password: string;
+  confirmPassword: string;
+  captchaInput: string;
+}
+
 @Component({
   selector: 'app-zepter-club',
   standalone: true,
+  imports: [RouterLink],
   templateUrl: './zepter-club.page.html',
   styleUrl: './zepter-club.page.scss'
 })
@@ -93,8 +108,27 @@ export class ZepterClubPage implements OnInit {
   readonly captchaCode = signal('');
   readonly shareMessage = signal('');
   readonly errorMessage = signal('');
+  readonly registrationErrorMessage = signal('');
+  readonly registrationSuccessMessage = signal('');
   readonly submitting = signal(false);
+  readonly registrationSubmitting = signal(false);
   readonly successModalOpen = signal(false);
+
+  readonly isLoggedIn = this.authService.isLoggedIn;
+
+  readonly registrationForm = signal<RegistrationForm>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phonePrefix: '+381',
+    phone: '',
+    country: 'Republika Srbija',
+    city: '',
+    address: '',
+    password: '',
+    confirmPassword: '',
+    captchaInput: ''
+  });
 
   readonly accountName = computed(() => {
     const user = this.authService.user();
@@ -112,7 +146,7 @@ export class ZepterClubPage implements OnInit {
   }
 
   closePage(): void {
-    this.router.navigateByUrl('/app/profile');
+    this.router.navigateByUrl(this.authService.isLoggedIn() ? '/app/profile' : '/app/home');
   }
 
   toggleSection(sectionId: BenefitSectionId): void {
@@ -127,6 +161,16 @@ export class ZepterClubPage implements OnInit {
 
   updateField<K extends keyof InviteForm>(field: K, value: InviteForm[K]): void {
     this.form.update((form) => ({
+      ...form,
+      [field]: value
+    }));
+  }
+
+  updateRegistrationField<K extends keyof RegistrationForm>(
+    field: K,
+    value: RegistrationForm[K]
+  ): void {
+    this.registrationForm.update((form) => ({
       ...form,
       [field]: value
     }));
@@ -165,6 +209,10 @@ export class ZepterClubPage implements OnInit {
       ...form,
       captchaInput: ''
     }));
+    this.registrationForm.update((form) => ({
+      ...form,
+      captchaInput: ''
+    }));
   }
 
   async shareInvite(): Promise<void> {
@@ -197,6 +245,11 @@ export class ZepterClubPage implements OnInit {
     this.errorMessage.set('');
     this.shareMessage.set('');
 
+    if (!this.authService.isLoggedIn()) {
+      this.errorMessage.set('Prijavite se da biste pozvali novog člana.');
+      return;
+    }
+
     if (!this.validateForm()) {
       return;
     }
@@ -212,12 +265,57 @@ export class ZepterClubPage implements OnInit {
     }, 700);
   }
 
+  submitRegistration(): void {
+    this.registrationErrorMessage.set('');
+    this.registrationSuccessMessage.set('');
+
+    if (!this.validateRegistrationForm()) {
+      return;
+    }
+
+    const form = this.registrationForm();
+    const payload: RegisterZepterClubPayload = {
+      firstName: form.firstName.trim(),
+      lastName: form.lastName.trim(),
+      email: form.email.trim(),
+      phone: `${form.phonePrefix.trim()} ${form.phone.trim()}`.trim(),
+      country: form.country.trim(),
+      city: form.city.trim(),
+      address: form.address.trim(),
+      password: form.password
+    };
+
+    this.registrationSubmitting.set(true);
+
+    this.authService.registerZepterClub(payload).subscribe({
+      next: () => {
+        this.registrationSubmitting.set(false);
+        this.registrationSuccessMessage.set('Uspešno ste registrovani u Zepter Club.');
+        this.resetRegistrationForm();
+        this.refreshCaptcha();
+        this.loadRegisteredMembersCount();
+      },
+      error: (error: { message?: string }) => {
+        this.registrationSubmitting.set(false);
+        this.registrationErrorMessage.set(
+          error.message || 'Registracija trenutno nije uspela. Pokušajte ponovo.'
+        );
+        this.refreshCaptcha();
+      }
+    });
+  }
+
   closeSuccessModal(): void {
     this.successModalOpen.set(false);
   }
 
   private loadRegisteredMembersCount(): void {
     const userPublicId = this.authService.user()?.publicId;
+
+    if (!userPublicId) {
+      this.registeredMembersCount.set(0);
+      return;
+    }
 
     this.clientService.getClients(userPublicId).subscribe({
       next: (clients) => this.registeredMembersCount.set(clients.length),
@@ -281,6 +379,72 @@ export class ZepterClubPage implements OnInit {
     return true;
   }
 
+  private validateRegistrationForm(): boolean {
+    const form = this.registrationForm();
+
+    if (!form.firstName.trim()) {
+      this.registrationErrorMessage.set('Unesite ime.');
+      return false;
+    }
+
+    if (!form.lastName.trim()) {
+      this.registrationErrorMessage.set('Unesite prezime.');
+      return false;
+    }
+
+    if (!form.email.trim()) {
+      this.registrationErrorMessage.set('Unesite email adresu.');
+      return false;
+    }
+
+    if (!/.+@.+\..+/.test(form.email.trim())) {
+      this.registrationErrorMessage.set('Unesite ispravnu email adresu.');
+      return false;
+    }
+
+    if (!form.phonePrefix.trim()) {
+      this.registrationErrorMessage.set('Unesite pozivni broj.');
+      return false;
+    }
+
+    if (!form.phone.trim()) {
+      this.registrationErrorMessage.set('Unesite broj telefona.');
+      return false;
+    }
+
+    if (form.phone.trim().length < 6) {
+      this.registrationErrorMessage.set('Broj telefona je prekratak.');
+      return false;
+    }
+
+    if (!form.country.trim()) {
+      this.registrationErrorMessage.set('Unesite državu.');
+      return false;
+    }
+
+    if (form.password.length < 6) {
+      this.registrationErrorMessage.set('Lozinka mora imati najmanje 6 karaktera.');
+      return false;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      this.registrationErrorMessage.set('Lozinke se ne poklapaju.');
+      return false;
+    }
+
+    if (!form.captchaInput.trim()) {
+      this.registrationErrorMessage.set('Unesite kod sa captcha slike.');
+      return false;
+    }
+
+    if (form.captchaInput.trim().toUpperCase() !== this.captchaCode()) {
+      this.registrationErrorMessage.set('Captcha kod nije ispravan.');
+      return false;
+    }
+
+    return true;
+  }
+
   private resetForm(): void {
     this.form.set({
       firstName: '',
@@ -291,6 +455,22 @@ export class ZepterClubPage implements OnInit {
       privilegedPriceEnabled: false,
       privilegedDiscount: null,
       privilegedDays: null,
+      captchaInput: ''
+    });
+  }
+
+  private resetRegistrationForm(): void {
+    this.registrationForm.set({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phonePrefix: '+381',
+      phone: '',
+      country: 'Republika Srbija',
+      city: '',
+      address: '',
+      password: '',
+      confirmPassword: '',
       captchaInput: ''
     });
   }

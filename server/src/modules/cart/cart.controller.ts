@@ -9,7 +9,8 @@ const cartSchema = z.object({
   items: z.array(
     z.object({
       productPublicId: z.string().min(1),
-      quantity: z.number().int().min(1).default(1)
+      quantity: z.number().int().min(1).default(1),
+      selectedPriceTier: z.enum(['retail', 'clubMember', 'clubPartner']).optional()
     })
   ).min(1)
 });

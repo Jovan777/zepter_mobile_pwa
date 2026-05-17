@@ -107,14 +107,16 @@
     </section>
 
     <footer class="product-buy-bar">
-      <div>
-        <span>BizzClub</span>
-        <strong>{{ item.prices.clubMember | rsdCurrency }}</strong>
-      </div>
-
-      <button type="button" (click)="addToCart()">
-        🛒 Dodaj u korpu
-      </button>
+      @for (tier of visiblePriceTiers(); track tier) {
+        <button
+          type="button"
+          [class.product-buy-bar__partner]="tier === 'clubPartner'"
+          (click)="addToCart(tier)"
+        >
+          <span>{{ priceTierLabel(tier) }}</span>
+          <strong>{{ item.prices[tier] | rsdCurrency }}</strong>
+        </button>
+      }
     </footer>
   }
 </section>

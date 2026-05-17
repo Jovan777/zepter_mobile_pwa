@@ -41,7 +41,16 @@
     </div>
   </section>
 
-  <button class="product-card__cart" type="button" aria-label="Dodaj u korpu" (click)="addToCart()">
-    🛒
-  </button>
+  <section class="product-card__cart-actions" aria-label="Dodaj u korpu">
+    @for (tier of visiblePriceTiers; track tier) {
+      <button
+        type="button"
+        [class.product-card__cart-action--partner]="tier === 'clubPartner'"
+        (click)="addToCart(tier)"
+      >
+        <span>{{ priceTierLabel(tier) }}</span>
+        <strong>{{ priceForTier(tier) | rsdCurrency }}</strong>
+      </button>
+    }
+  </section>
 </article>

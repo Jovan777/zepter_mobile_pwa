@@ -6,66 +6,93 @@ import { calculateCart } from '../cart/cart.service';
 import { createPublicId } from '../../utils/publicId';
 import { HttpError } from '../../utils/httpError';
 
-const offerClientSchema = z.object({
+function money(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+const priceTierSchema = z.enum(['retail', 'clubMember', 'clubPartner']);
+
+const offerRecipientSchema = z.object({
   clientPublicId: z.string().optional().default(''),
+  source: z.enum(['CLIENT', 'MANUAL']).optional().default('MANUAL'),
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   email: z.string().email().optional().or(z.literal('')),
-  phone: z.string().optional().default('')
+  phone: z.string().optional().default(''),
+  address: z.string().optional().default(''),
+  city: z.string().optional().default(''),
+  country: z.string().optional().default('Republika Srbija')
+});
+
+const privilegedConditionsSchema = z.object({
+  enabled: z.boolean().default(false),
+  discountPercent: z.number().min(0).max(90).default(0),
+  validUntil: z.coerce.date(),
+  promoCodeEnabled: z.boolean().default(false),
+  promoCode: z.string().optional().default('')
 });
 
 const offerBodySchema = z.object({
-  userPublicId: z.string().min(1),
+  sellerUserPublicId: z.string().min(1),
+  mode: z.literal('OFFERING').default('OFFERING'),
   items: z.array(
     z.object({
       productPublicId: z.string().min(1),
       quantity: z.number().int().min(1).default(1),
-      privilegedDiscountLevel: z.string().optional().default('')
+      selectedPriceTier: priceTierSchema.optional().default('clubMember')
     })
   ).min(1),
-  clients: z.array(offerClientSchema).min(1),
-  validUntil: z.coerce.date(),
-  promoCode: z.string().optional().default(''),
-  privilegedConditions: z.string().optional().default(''),
-  message: z.string().optional().default(''),
-  sendVia: z.array(z.enum(['EMAIL', 'PHONE'])).min(1).default(['EMAIL'])
+  recipients: z.array(offerRecipientSchema).min(1),
+  privilegedConditions: privilegedConditionsSchema,
+  note: z.string().optional().default(''),
+  status: z.enum(['DRAFT', 'SENT']).optional().default('SENT')
 });
 
 export const createOffer = asyncHandler(async (req: Request, res: Response) => {
   const body = offerBodySchema.parse(req.body);
-  const calculated = await calculateCart('OFFERING', body.items, 'clubMember');
+  const calculated = await calculateCart('OFFERING', body.items);
+  const discountMultiplier =
+    body.privilegedConditions.enabled && body.privilegedConditions.discountPercent > 0
+      ? (100 - body.privilegedConditions.discountPercent) / 100
+      : 1;
 
-  const offerItems = calculated.items.map((item) => {
-    const requestedItem = body.items.find((input) => input.productPublicId === item.productPublicId);
+  const offerItems = calculated.items.map((item) => ({
+    productPublicId: item.productPublicId,
+    name: item.name,
+    code: item.code,
+    imageUrl: item.imageUrl,
+    quantity: item.quantity,
+    unitPrices: item.unitPrices,
+    lineTotals: {
+      retail: item.lineTotals.retail,
+      clubMember: item.lineTotals.clubMember,
+      clubPartner: item.lineTotals.clubPartner
+    },
+    selectedPriceTier: item.selectedPriceTier,
+    selectedUnitPrice: item.selectedUnitPrice,
+    selectedLineTotal: item.selectedLineTotal,
+    offerUnitPrice: money(item.selectedUnitPrice * discountMultiplier),
+    offerLineTotal: money(item.selectedLineTotal * discountMultiplier)
+  }));
 
-    return {
-      productPublicId: item.productPublicId,
-      name: item.name,
-      code: item.code,
-      imageUrl: item.imageUrl,
-      quantity: item.quantity,
-      unitPrice: item.unitPrices.clubMember,
-      lineTotal: item.lineTotals.clubMember,
-      privilegedDiscountLevel: requestedItem?.privilegedDiscountLevel || ''
-    };
-  });
+  const offerSubtotal = money(offerItems.reduce((sum, item) => sum + item.offerLineTotal, 0));
 
   const offer = await Offer.create({
     publicId: createPublicId('OFF'),
-    userPublicId: body.userPublicId,
+    sellerUserPublicId: body.sellerUserPublicId,
+    mode: 'OFFERING',
     items: offerItems,
-    clients: body.clients,
-    validUntil: body.validUntil,
-    promoCode: body.promoCode,
+    recipients: body.recipients,
     privilegedConditions: body.privilegedConditions,
-    message: body.message,
-    sendVia: body.sendVia,
     totals: {
-      selectedSubtotal: calculated.totals.clubMemberSubtotal,
-      grandTotal: calculated.totals.clubMemberSubtotal,
-      currency: 'RSD'
+      retailSubtotal: calculated.totals.retailSubtotal,
+      clubMemberSubtotal: calculated.totals.clubMemberSubtotal,
+      clubPartnerSubtotal: calculated.totals.clubPartnerSubtotal,
+      offerSubtotal,
+      currency: calculated.totals.currency
     },
-    status: 'SENT'
+    status: body.status,
+    note: body.note
   });
 
   res.status(201).json({
@@ -76,9 +103,10 @@ export const createOffer = asyncHandler(async (req: Request, res: Response) => {
 
 export const getOffers = asyncHandler(async (req: Request, res: Response) => {
   const filter: Record<string, unknown> = {};
+  const sellerUserPublicId = req.query.sellerUserPublicId || req.query.userPublicId;
 
-  if (req.query.userPublicId) {
-    filter.userPublicId = String(req.query.userPublicId);
+  if (sellerUserPublicId) {
+    filter.sellerUserPublicId = String(sellerUserPublicId);
   }
 
   const offers = await Offer.find(filter).sort({ createdAt: -1 }).lean();

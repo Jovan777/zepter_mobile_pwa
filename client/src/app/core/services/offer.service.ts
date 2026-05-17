@@ -11,8 +11,8 @@ export class OfferService {
   private readonly api = inject(ApiService);
   private readonly cartService = inject(CartService);
 
-  getOffers(userPublicId?: string): Observable<Offer[]> {
-    return this.api.get<Offer[]>('/offers', { userPublicId });
+  getOffers(sellerUserPublicId?: string): Observable<Offer[]> {
+    return this.api.get<Offer[]>('/offers', { sellerUserPublicId });
   }
 
   getOfferByPublicId(publicId: string): Observable<Offer> {

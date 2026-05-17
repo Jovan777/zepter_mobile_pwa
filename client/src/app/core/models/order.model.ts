@@ -25,6 +25,9 @@ export interface OrderItem {
   code: string;
   imageUrl: string;
   quantity: number;
+  selectedPriceTier: PriceTier;
+  selectedUnitPrice: number;
+  selectedLineTotal: number;
   unitPrice: number;
   lineTotal: number;
 }
@@ -67,6 +70,7 @@ export interface CreateOrderPayload {
   items: Array<{
     productPublicId: string;
     quantity: number;
+    selectedPriceTier?: PriceTier;
   }>;
   buyerDetails: PersonDetails;
   deliveryDetails?: PersonDetails;

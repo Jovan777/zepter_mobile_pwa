@@ -4,6 +4,7 @@ export type PriceTier = 'retail' | 'clubMember' | 'clubPartner';
 export interface CartInputItem {
   productPublicId: string;
   quantity: number;
+  selectedPriceTier?: PriceTier;
 }
 
 export interface CalculatedCartItem {
@@ -13,6 +14,9 @@ export interface CalculatedCartItem {
   categoryName: string;
   imageUrl: string;
   quantity: number;
+  selectedPriceTier: PriceTier;
+  selectedUnitPrice: number;
+  selectedLineTotal: number;
   unitPrices: {
     retail: number;
     clubMember: number;

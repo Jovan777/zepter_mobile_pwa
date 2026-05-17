@@ -21,6 +21,13 @@ const OrderItemSchema = new Schema(
     code: { type: String, required: true },
     imageUrl: { type: String, default: '' },
     quantity: { type: Number, required: true },
+    selectedPriceTier: {
+      type: String,
+      enum: ['retail', 'clubMember', 'clubPartner'],
+      default: 'retail'
+    },
+    selectedUnitPrice: { type: Number, required: true },
+    selectedLineTotal: { type: Number, required: true },
     unitPrice: { type: Number, required: true },
     lineTotal: { type: Number, required: true }
   },

@@ -27,7 +27,7 @@
     }
 
     <section class="cart-items">
-      @for (item of cart()?.items || []; track item.productPublicId) {
+      @for (item of cart()?.items || []; track item.productPublicId + item.selectedPriceTier) {
         <article class="cart-item">
           <div class="cart-item__image">
             <img [src]="imageUrl(item.imageUrl)" [alt]="item.name" />
@@ -63,12 +63,25 @@
                   <span>BizzClub</span>
                   <strong>{{ item.unitPrices.clubMember | rsdCurrency }}</strong>
                 </div>
+
+                <div class="cart-item__selected">
+                  <span>
+                    @if (item.selectedPriceTier === 'retail') {
+                      Izabrano MP
+                    } @else if (item.selectedPriceTier === 'clubMember') {
+                      Izabrano Club
+                    } @else {
+                      Izabrano Partner
+                    }
+                  </span>
+                  <strong>{{ item.selectedUnitPrice | rsdCurrency }}</strong>
+                </div>
               </div>
             </div>
 
             <footer class="cart-item__total">
               <span>Ukupna cena</span>
-              <strong>{{ item.lineTotals.selected | rsdCurrency }}</strong>
+              <strong>{{ item.selectedLineTotal | rsdCurrency }}</strong>
             </footer>
           </section>
         </article>

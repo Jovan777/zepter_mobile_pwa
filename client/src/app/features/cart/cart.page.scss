@@ -244,6 +244,15 @@
   color: var(--color-gold-dark);
 }
 
+.cart-item__prices .cart-item__selected {
+  background: #111111;
+}
+
+.cart-item__prices .cart-item__selected span,
+.cart-item__prices .cart-item__selected strong {
+  color: #ffffff;
+}
+
 .cart-item__total {
   min-height: 40px;
   display: grid;

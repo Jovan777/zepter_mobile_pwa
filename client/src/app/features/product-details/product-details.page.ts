@@ -1,6 +1,8 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { PriceTier } from '../../core/models/cart.model';
 import { Product } from '../../core/models/product.model';
+import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
 import { ProductService } from '../../core/services/product.service';
 import { WishlistService } from '../../core/services/wishlist.service';
@@ -19,6 +21,7 @@ type ProductTab = 'description' | 'details' | 'technical';
 })
 export class ProductDetailsPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly authService = inject(AuthService);
   private readonly productService = inject(ProductService);
   private readonly cartService = inject(CartService);
   private readonly wishlistService = inject(WishlistService);
@@ -48,6 +51,24 @@ export class ProductDetailsPage implements OnInit {
     return this.wishlistService.isInWishlist(product.publicId);
   });
 
+  readonly visiblePriceTiers = computed<PriceTier[]>(() => {
+    const user = this.authService.user();
+
+    if (!user) {
+      return ['retail'];
+    }
+
+    if (user.clubStatus === 'PARTNER' || user.role === 'PARTNER' || user.role === 'ADMIN') {
+      return ['retail', 'clubMember', 'clubPartner'];
+    }
+
+    if (user.clubStatus === 'MEMBER') {
+      return ['retail', 'clubMember'];
+    }
+
+    return ['retail'];
+  });
+
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
       const publicId = params.get('publicId');
@@ -70,15 +91,25 @@ export class ProductDetailsPage implements OnInit {
     this.selectedTab.set(tab);
   }
 
-  addToCart(): void {
+  priceTierLabel(tier: PriceTier): string {
+    const labels: Record<PriceTier, string> = {
+      retail: 'MP cena',
+      clubMember: 'ZepterClub cena',
+      clubPartner: 'Partner cena'
+    };
+
+    return labels[tier];
+  }
+
+  addToCart(tier: PriceTier): void {
     const product = this.product();
 
     if (!product) {
       return;
     }
 
-    this.cartService.addItem(product.publicId, 1);
-    this.addedMessage.set('Proizvod je dodat u korpu.');
+    this.cartService.addItem(product.publicId, 1, tier);
+    this.addedMessage.set(`${this.priceTierLabel(tier)} je dodata u korpu.`);
 
     window.setTimeout(() => this.addedMessage.set(''), 1600);
   }

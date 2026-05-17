@@ -28,34 +28,47 @@ export class CartService {
   );
   readonly hasItems = computed(() => this.itemsSignal().length > 0);
 
-  addItem(productPublicId: string, quantity = 1): void {
+  addItem(productPublicId: string, quantity = 1, selectedPriceTier: PriceTier = 'retail'): void {
     const items = [...this.itemsSignal()];
-    const existing = items.find((item) => item.productPublicId === productPublicId);
+    const existing = items.find(
+      (item) => item.productPublicId === productPublicId && item.selectedPriceTier === selectedPriceTier
+    );
 
     if (existing) {
       existing.quantity += quantity;
     } else {
-      items.push({ productPublicId, quantity });
+      items.push({ productPublicId, quantity, selectedPriceTier });
     }
 
     this.setItems(items);
   }
 
-  updateQuantity(productPublicId: string, quantity: number): void {
+  updateQuantity(
+    productPublicId: string,
+    quantity: number,
+    selectedPriceTier: PriceTier = 'retail'
+  ): void {
     if (quantity <= 0) {
-      this.removeItem(productPublicId);
+      this.removeItem(productPublicId, selectedPriceTier);
       return;
     }
 
     this.setItems(
       this.itemsSignal().map((item) =>
-        item.productPublicId === productPublicId ? { ...item, quantity } : item
+        item.productPublicId === productPublicId && item.selectedPriceTier === selectedPriceTier
+          ? { ...item, quantity }
+          : item
       )
     );
   }
 
-  removeItem(productPublicId: string): void {
-    this.setItems(this.itemsSignal().filter((item) => item.productPublicId !== productPublicId));
+  removeItem(productPublicId: string, selectedPriceTier: PriceTier = 'retail'): void {
+    this.setItems(
+      this.itemsSignal().filter(
+        (item) =>
+          item.productPublicId !== productPublicId || item.selectedPriceTier !== selectedPriceTier
+      )
+    );
   }
 
   clearCart(): void {
@@ -89,7 +102,14 @@ export class CartService {
 
     try {
       const parsed = JSON.parse(raw) as LocalCartItem[];
-      return Array.isArray(parsed) ? parsed : [];
+      return Array.isArray(parsed)
+        ? parsed
+            .filter((item) => item?.productPublicId && item.quantity > 0)
+            .map((item) => ({
+              ...item,
+              selectedPriceTier: item.selectedPriceTier || 'retail'
+            }))
+        : [];
     } catch {
       localStorage.removeItem(STORAGE_KEY);
       return [];

@@ -120,7 +120,7 @@
               </section>
 
               <section class="order-products-preview">
-                @for (item of order.items.slice(0, 3); track item.productPublicId) {
+                @for (item of order.items.slice(0, 3); track item.productPublicId + item.selectedPriceTier) {
                   <div class="order-product-mini">
                     <img [src]="imageUrl(item.imageUrl)" [alt]="item.name" />
                   </div>
@@ -156,14 +156,23 @@
                     <h3>Proizvodi</h3>
 
                     <div class="order-details__items">
-                      @for (item of order.items; track item.productPublicId) {
+                      @for (item of order.items; track item.productPublicId + item.selectedPriceTier) {
                         <article class="order-detail-item">
                           <img [src]="imageUrl(item.imageUrl)" [alt]="item.name" />
 
                           <div>
                             <span>{{ item.code }}</span>
                             <strong>{{ item.name }}</strong>
-                            <small>Količina: {{ item.quantity }}</small>
+                            <small>
+                              Količina: {{ item.quantity }} ·
+                              @if (item.selectedPriceTier === 'retail') {
+                                MP cena
+                              } @else if (item.selectedPriceTier === 'clubMember') {
+                                Club cena
+                              } @else {
+                                Partner cena
+                              }
+                            </small>
                           </div>
 
                           <b>{{ item.lineTotal | rsdCurrency }}</b>

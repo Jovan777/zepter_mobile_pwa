@@ -23,6 +23,7 @@ interface CheckoutForm {
   pickupFromOffice: boolean;
   comment: string;
   promoCode: string;
+  clientWantsClubMembership: boolean;
 }
 
 interface PaymentOption {
@@ -52,6 +53,8 @@ export class CheckoutPage implements OnInit {
   readonly createdOrderPublicId = signal('');
 
   readonly paymentMethod = signal<PaymentMethod>('CARD');
+  readonly mode = this.commerceModeService.mode;
+  readonly isSelling = computed(() => this.mode() === 'SELLING');
 
   readonly captchaCode = signal(this.generateCaptcha());
   readonly captchaInput = signal('');
@@ -68,18 +71,19 @@ readonly form = signal<CheckoutForm>({
   email: '',
   pickupFromOffice: false,
   comment: '',
-  promoCode: ''
+  promoCode: '',
+  clientWantsClubMembership: false
 });
 
   readonly paymentOptions: PaymentOption[] = [
     {
       value: 'CARD',
-      title: 'Plaćanje karticom online',
+      title: 'Online plaćanje karticom',
       description: 'Plaćanje karticom zahteva kasniju integraciju platnog procesora.'
     },
     {
       value: 'PAYMENT_SLIP',
-      title: 'Bankovni prenos',
+      title: 'Bankovni prenos / uplatnica',
       description: 'Porudžbina se potvrđuje nakon evidentiranja uplate.'
     },
     {
@@ -124,9 +128,20 @@ readonly form = signal<CheckoutForm>({
       return;
     }
 
+    const mode = this.commerceModeService.mode();
     const user = this.authService.user();
 
-    if (user) {
+    if (mode === 'OFFERING') {
+      this.router.navigateByUrl('/app/offer');
+      return;
+    }
+
+    if (mode === 'SELLING' && !user) {
+      this.router.navigateByUrl('/login');
+      return;
+    }
+
+    if (user && mode === 'BUYING') {
       this.form.update((form) => ({
         ...form,
         firstName: user.firstName || '',
@@ -135,7 +150,7 @@ readonly form = signal<CheckoutForm>({
       }));
     }
 
-    this.cartService.calculate('clubMember').subscribe();
+    this.cartService.calculate().subscribe();
   }
 
   imageUrl(path: string): string {
@@ -239,13 +254,13 @@ readonly form = signal<CheckoutForm>({
       .createOrder({
         userPublicId: this.authService.user()?.publicId || 'guest-user',
         mode: orderMode,
-        selectedPriceTier: 'clubMember',
         items: this.cartService.items(),
         buyerDetails,
         deliveryDetails: form.pickupFromOffice ? undefined : buyerDetails,
         sameDeliveryAddress: !form.pickupFromOffice,
         isGift: false,
-        clientWantsClubMembership: orderMode === 'SELLING',
+        clientWantsClubMembership:
+          orderMode === 'SELLING' ? form.clientWantsClubMembership : false,
         paymentMethod: this.paymentMethod(),
         note: form.comment.trim(),
         promoCode: form.promoCode.trim()

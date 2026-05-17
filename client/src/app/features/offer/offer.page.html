@@ -1,0 +1,253 @@
+<section class="offer-page mobile-page">
+  <header class="offer-top">
+    <button type="button" aria-label="Nazad" (click)="goBackToCart()">←</button>
+
+    <div>
+      <span>Zepter BizzClub</span>
+      <h1>Ponuda</h1>
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <p class="offer-error">{{ errorMessage() }}</p>
+  }
+
+  @if (cart(); as currentCart) {
+    <section class="offer-card">
+      <h2>Proizvodi u ponudi</h2>
+
+      <div class="offer-products">
+        @for (item of currentCart.items; track item.productPublicId + item.selectedPriceTier) {
+          <article class="offer-product">
+            <img [src]="imageUrl(item.imageUrl)" [alt]="item.name" />
+
+            <div>
+              <span>{{ item.code }}</span>
+              <strong>{{ item.name }}</strong>
+              <small>Količina: {{ item.quantity }}</small>
+            </div>
+
+            <dl>
+              <div>
+                <dt>MP cena</dt>
+                <dd>{{ item.lineTotals.retail | rsdCurrency }}</dd>
+              </div>
+
+              <div>
+                <dt>ZepterClub cena</dt>
+                <dd>{{ item.lineTotals.clubMember | rsdCurrency }}</dd>
+              </div>
+
+              <div class="offer-product__selected">
+                <dt>Izabrana vrednost</dt>
+                <dd>{{ item.selectedLineTotal | rsdCurrency }}</dd>
+              </div>
+            </dl>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="offer-card privileged">
+      <h2>Slanje ponude sa privilegovanim uslovima</h2>
+
+      <label class="switch-row">
+        <input
+          type="checkbox"
+          [checked]="privilegedEnabled()"
+          (change)="privilegedEnabled.set($any($event.target).checked)"
+        />
+        <span>Aktiviraj privilegovane uslove</span>
+      </label>
+
+      <label>
+        <span>Popust za ponudu (%)</span>
+        <input
+          type="number"
+          min="0"
+          max="90"
+          [value]="discountPercent()"
+          (input)="discountPercent.set(+$any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>Rok važenja</span>
+        <input
+          type="date"
+          [value]="validUntil()"
+          (input)="validUntil.set($any($event.target).value)"
+        />
+      </label>
+
+      <label class="switch-row">
+        <input
+          type="checkbox"
+          [checked]="promoCodeEnabled()"
+          (change)="promoCodeEnabled.set($any($event.target).checked)"
+        />
+        <span>Uključi promo kod</span>
+      </label>
+
+      @if (promoCodeEnabled()) {
+        <label>
+          <span>Promo kod</span>
+          <input
+            type="text"
+            placeholder="Npr. ZEPTER10"
+            [value]="promoCode()"
+            (input)="promoCode.set($any($event.target).value.toUpperCase())"
+          />
+        </label>
+      }
+    </section>
+
+    <section class="offer-card">
+      <h2>Klijenti</h2>
+
+      <label>
+        <span>Pretraga klijenata</span>
+        <input
+          type="search"
+          placeholder="Ime, email ili telefon"
+          [value]="searchTerm()"
+          (input)="searchTerm.set($any($event.target).value)"
+        />
+      </label>
+
+      <div class="client-list">
+        @for (client of filteredClients(); track client.publicId) {
+          <button
+            type="button"
+            [class.active]="isClientSelected(client.publicId)"
+            (click)="toggleClient(client.publicId)"
+          >
+            <span>{{ isClientSelected(client.publicId) ? '✓' : '+' }}</span>
+
+            <div>
+              <strong>{{ client.firstName }} {{ client.lastName }}</strong>
+              <small>{{ client.email || client.phone || 'Klijent' }}</small>
+            </div>
+          </button>
+        }
+      </div>
+
+      <p class="offer-muted">Izabrano klijenata: {{ selectedClientCount() }}</p>
+    </section>
+
+    <section class="offer-card manual-recipient">
+      <h2>Ručni primalac</h2>
+
+      <label>
+        <span>Ime</span>
+        <input
+          type="text"
+          [value]="manualRecipient().firstName"
+          (input)="updateManualField('firstName', $any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>Prezime</span>
+        <input
+          type="text"
+          [value]="manualRecipient().lastName"
+          (input)="updateManualField('lastName', $any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>Email</span>
+        <input
+          type="email"
+          [value]="manualRecipient().email"
+          (input)="updateManualField('email', $any($event.target).value)"
+        />
+      </label>
+
+      <div class="phone-row">
+        <label>
+          <span>Pozivni</span>
+          <input
+            type="text"
+            [value]="manualRecipient().phonePrefix"
+            (input)="updateManualField('phonePrefix', $any($event.target).value)"
+          />
+        </label>
+
+        <label>
+          <span>Telefon</span>
+          <input
+            type="tel"
+            [value]="manualRecipient().phone"
+            (input)="updateManualField('phone', $any($event.target).value)"
+          />
+        </label>
+      </div>
+
+      <label>
+        <span>Adresa</span>
+        <input
+          type="text"
+          [value]="manualRecipient().address"
+          (input)="updateManualField('address', $any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>Grad</span>
+        <input
+          type="text"
+          [value]="manualRecipient().city"
+          (input)="updateManualField('city', $any($event.target).value)"
+        />
+      </label>
+    </section>
+
+    <section class="offer-card">
+      <h2>Napomena</h2>
+      <textarea
+        placeholder="Poruka uz ponudu"
+        [value]="note()"
+        (input)="note.set($any($event.target).value)"
+      ></textarea>
+    </section>
+
+    <section class="offer-summary">
+      <div>
+        <span>Nečlan Club-a total</span>
+        <strong>{{ currentCart.totals.retailSubtotal | rsdCurrency }}</strong>
+      </div>
+
+      <div>
+        <span>Član ZepterClub-a total</span>
+        <strong>{{ currentCart.totals.clubMemberSubtotal | rsdCurrency }}</strong>
+      </div>
+
+      <div class="offer-summary__total">
+        <span>Ukupna vrednost</span>
+        <strong>{{ offerSubtotal() | rsdCurrency }}</strong>
+      </div>
+
+      <button type="button" [disabled]="loading()" (click)="submitOffer()">
+        {{ loading() ? 'Slanje...' : 'Pošalji ponudu' }}
+      </button>
+
+      <button class="offer-summary__secondary" type="button" (click)="goBackToCart()">
+        Nazad u korpu
+      </button>
+    </section>
+  }
+
+  @if (successModalOpen()) {
+    <div class="offer-success-backdrop"></div>
+
+    <section class="offer-success">
+      <img src="/assets/images/logos/zepter-logo.png" alt="Zepter" />
+      <div>✓</div>
+      <h2>Ponuda je uspešno poslata</h2>
+      <p>Broj ponude: {{ createdOfferPublicId() }}</p>
+      <a routerLink="/app/home">U redu</a>
+    </section>
+  }
+</section>

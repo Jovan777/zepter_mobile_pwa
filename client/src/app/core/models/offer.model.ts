@@ -1,26 +1,37 @@
-import { CartItemInput } from './cart.model';
+import { CartItemInput, PriceTier } from './cart.model';
 
-export interface OfferClient {
+export interface OfferRecipient {
   clientPublicId?: string;
+  source: 'CLIENT' | 'MANUAL';
   firstName: string;
   lastName: string;
   email?: string;
   phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+}
+
+export interface PrivilegedConditions {
+  enabled: boolean;
+  discountPercent: number;
+  validUntil: string | Date;
+  promoCodeEnabled: boolean;
+  promoCode?: string;
 }
 
 export interface CreateOfferItem extends CartItemInput {
-  privilegedDiscountLevel?: string;
+  selectedPriceTier?: PriceTier;
 }
 
 export interface CreateOfferPayload {
-  userPublicId: string;
+  sellerUserPublicId: string;
+  mode: 'OFFERING';
   items: CreateOfferItem[];
-  clients: OfferClient[];
-  validUntil: string | Date;
-  promoCode?: string;
-  privilegedConditions?: string;
-  message?: string;
-  sendVia: ('EMAIL' | 'PHONE')[];
+  recipients: OfferRecipient[];
+  privilegedConditions: PrivilegedConditions;
+  note?: string;
+  status?: 'DRAFT' | 'SENT';
 }
 
 export interface OfferItem {
@@ -29,27 +40,31 @@ export interface OfferItem {
   code: string;
   imageUrl: string;
   quantity: number;
-  unitPrice: number;
-  lineTotal: number;
-  privilegedDiscountLevel?: string;
+  unitPrices: Record<PriceTier, number>;
+  lineTotals: Record<PriceTier, number>;
+  selectedPriceTier: PriceTier;
+  selectedUnitPrice: number;
+  selectedLineTotal: number;
+  offerUnitPrice: number;
+  offerLineTotal: number;
 }
 
 export interface Offer {
   _id?: string;
   publicId: string;
-  userPublicId: string;
+  sellerUserPublicId: string;
+  mode: 'OFFERING';
   items: OfferItem[];
-  clients: OfferClient[];
-  validUntil: string;
-  promoCode?: string;
-  privilegedConditions?: string;
-  message?: string;
-  sendVia: ('EMAIL' | 'PHONE')[];
+  recipients: OfferRecipient[];
+  privilegedConditions: PrivilegedConditions;
   totals: {
-    selectedSubtotal: number;
-    grandTotal: number;
+    retailSubtotal: number;
+    clubMemberSubtotal: number;
+    clubPartnerSubtotal: number;
+    offerSubtotal: number;
     currency: 'RSD' | 'EUR';
   };
-  status: 'DRAFT' | 'SENT';
+  status: 'DRAFT' | 'SENT' | 'EXPIRED' | 'ACCEPTED' | 'CANCELLED';
+  note?: string;
   createdAt: string;
 }

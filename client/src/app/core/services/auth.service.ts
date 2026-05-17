@@ -8,6 +8,17 @@ interface LoginPayload {
   password: string;
 }
 
+export interface RegisterZepterClubPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  country?: string;
+  city?: string;
+  address?: string;
+  password: string;
+}
+
 interface LoginResponse {
   token: string;
   user: Pick<User, 'publicId' | 'email' | 'firstName' | 'lastName' | 'role' | 'clubStatus'>;
@@ -42,6 +53,12 @@ export class AuthService {
     return this.api.post<LoginResponse, Record<string, never>>('/auth/demo-login', {}).pipe(
       tap((response) => this.persistSession(response))
     );
+  }
+
+  registerZepterClub(payload: RegisterZepterClubPayload): Observable<LoginResponse> {
+    return this.api
+      .post<LoginResponse, RegisterZepterClubPayload>('/auth/register-zepter-club', payload)
+      .pipe(tap((response) => this.persistSession(response)));
   }
 
   continueAsGuest(): void {

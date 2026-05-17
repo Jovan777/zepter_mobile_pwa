@@ -24,7 +24,8 @@ const orderBodySchema = z.object({
   items: z.array(
     z.object({
       productPublicId: z.string().min(1),
-      quantity: z.number().int().min(1).default(1)
+      quantity: z.number().int().min(1).default(1),
+      selectedPriceTier: z.enum(['retail', 'clubMember', 'clubPartner']).optional()
     })
   ).min(1),
   buyerDetails: personSchema,
@@ -42,21 +43,17 @@ export const createOrder = asyncHandler(async (req: Request, res: Response) => {
   const calculated = await calculateCart(body.mode, body.items, body.selectedPriceTier);
 
   const orderItems = calculated.items.map((item) => {
-    const selectedPrice =
-      calculated.totals.selectedPriceTier === 'retail'
-        ? item.unitPrices.retail
-        : calculated.totals.selectedPriceTier === 'clubMember'
-          ? item.unitPrices.clubMember
-          : item.unitPrices.clubPartner;
-
     return {
       productPublicId: item.productPublicId,
       name: item.name,
       code: item.code,
       imageUrl: item.imageUrl,
       quantity: item.quantity,
-      unitPrice: selectedPrice,
-      lineTotal: item.lineTotals.selected
+      selectedPriceTier: item.selectedPriceTier,
+      selectedUnitPrice: item.selectedUnitPrice,
+      selectedLineTotal: item.selectedLineTotal,
+      unitPrice: item.selectedUnitPrice,
+      lineTotal: item.selectedLineTotal
     };
   });
 

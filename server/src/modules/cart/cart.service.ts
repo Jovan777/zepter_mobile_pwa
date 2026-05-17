@@ -11,11 +11,7 @@ export function resolveSelectedPriceTier(mode: CommerceMode, requestedTier?: Pri
     return requestedTier;
   }
 
-  if (mode === 'BUYING') {
-    return 'clubPartner';
-  }
-
-  return 'clubMember';
+  return 'retail';
 }
 
 export async function calculateCart(
@@ -27,14 +23,14 @@ export async function calculateCart(
     throw new HttpError(400, 'Cart must contain at least one item');
   }
 
-  const productIds = inputItems.map((item) => item.productPublicId);
+  const productIds = [...new Set(inputItems.map((item) => item.productPublicId))];
   const products = await Product.find({ publicId: { $in: productIds }, isActive: true }).lean();
 
   if (products.length !== productIds.length) {
     throw new HttpError(400, 'Some products were not found or are inactive');
   }
 
-  const selectedPriceTier = resolveSelectedPriceTier(mode, requestedTier);
+  const fallbackPriceTier = resolveSelectedPriceTier(mode, requestedTier);
 
   const items = inputItems.map((inputItem) => {
     const product = products.find((item) => item.publicId === inputItem.productPublicId);
@@ -45,9 +41,12 @@ export async function calculateCart(
 
     const quantity = Math.max(1, inputItem.quantity || 1);
 
+    const selectedPriceTier = resolveSelectedPriceTier(mode, inputItem.selectedPriceTier || fallbackPriceTier);
+    const selectedUnitPrice = product.prices[selectedPriceTier];
     const retail = money(product.prices.retail * quantity);
     const clubMember = money(product.prices.clubMember * quantity);
     const clubPartner = money(product.prices.clubPartner * quantity);
+    const selectedLineTotal = money(selectedUnitPrice * quantity);
 
     return {
       productPublicId: product.publicId,
@@ -56,6 +55,9 @@ export async function calculateCart(
       categoryName: product.categoryName,
       imageUrl: product.images[0] || '',
       quantity,
+      selectedPriceTier,
+      selectedUnitPrice,
+      selectedLineTotal,
       unitPrices: {
         retail: product.prices.retail,
         clubMember: product.prices.clubMember,
@@ -65,12 +67,7 @@ export async function calculateCart(
         retail,
         clubMember,
         clubPartner,
-        selected:
-          selectedPriceTier === 'retail'
-            ? retail
-            : selectedPriceTier === 'clubMember'
-              ? clubMember
-              : clubPartner
+        selected: selectedLineTotal
       }
     };
   });
@@ -90,7 +87,7 @@ export async function calculateCart(
     deliveryFee,
     grandTotal: money(selectedSubtotal + deliveryFee),
     currency: 'RSD',
-    selectedPriceTier
+    selectedPriceTier: fallbackPriceTier
   };
 
   return { items, totals };

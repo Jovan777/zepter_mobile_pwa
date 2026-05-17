@@ -104,179 +104,344 @@
       }
     </section>
 
-    <section class="account-card">
-      <div class="account-card__icon">👤</div>
+    @if (isLoggedIn()) {
+      <section class="account-card">
+        <div class="account-card__icon">👤</div>
 
-      <div class="account-card__content">
-        <p>Vaš nalog <strong>{{ accountName() }}</strong></p>
-        <span>Broj registrovanih članova <strong>{{ registeredMembersCount() }}</strong></span>
-      </div>
-    </section>
-
-    <section class="invite-promo">
-      <div class="invite-promo__top">
-        <div>
-          <h2>Učlanite nove partnere</h2>
-          <p>
-            Premija do 10% na njihovu prvu kupovinu i provizija od 5% do 40%
-            kroz dalju kupovinu.
-          </p>
+        <div class="account-card__content">
+          <p>Vaš nalog <strong>{{ accountName() }}</strong></p>
+          <span>Broj registrovanih članova <strong>{{ registeredMembersCount() }}</strong></span>
         </div>
+      </section>
 
-        <button type="button" class="share-button" (click)="shareInvite()">
-          ⤴
-        </button>
-      </div>
-
-      @if (shareMessage()) {
-        <p class="share-message">{{ shareMessage() }}</p>
+      @if (registrationSuccessMessage()) {
+        <p class="registration-success">{{ registrationSuccessMessage() }}</p>
       }
 
-      <ul class="invite-promo__bullets">
-        <li>
-          Pozovite nove partnere u <strong>Zepter BizzClub</strong> i podelite
-          im pogodnosti članstva.
-        </li>
-        <li>
-          Novi članovi dobijaju iste osnovne privilegije i pristup Zepter svetu.
-        </li>
-      </ul>
-    </section>
-
-    <section class="invite-form-card">
-      <label class="form-field">
-        <span>Ime *</span>
-        <input
-          type="text"
-          [value]="form().firstName"
-          (input)="updateField('firstName', $any($event.target).value)"
-          placeholder="Unesite ime"
-        />
-      </label>
-
-      <label class="form-field">
-        <span>Prezime *</span>
-        <input
-          type="text"
-          [value]="form().lastName"
-          (input)="updateField('lastName', $any($event.target).value)"
-          placeholder="Unesite prezime"
-        />
-      </label>
-
-      <label class="form-field">
-        <span>Email *</span>
-        <input
-          type="email"
-          [value]="form().email"
-          (input)="updateField('email', $any($event.target).value)"
-          placeholder="Unesite email adresu"
-        />
-      </label>
-
-      <div class="phone-row">
-        <label class="form-field form-field--prefix">
-          <span>Pozivni</span>
-          <input
-            type="text"
-            [value]="form().phonePrefix"
-            (input)="updateField('phonePrefix', $any($event.target).value)"
-          />
-        </label>
-
-        <label class="form-field">
-          <span>Telefon *</span>
-          <input
-            type="tel"
-            [value]="form().phone"
-            (input)="updateField('phone', $any($event.target).value)"
-            placeholder="Unesite broj telefona"
-          />
-        </label>
-      </div>
-
-      <p class="form-note">Polja označena zvezdicom su obavezna.</p>
-
-      <button
-        type="button"
-        class="privileged-toggle"
-        [class.privileged-toggle--active]="form().privilegedPriceEnabled"
-        (click)="togglePrivilegedPrice()"
-      >
-        <span class="privileged-toggle__checkbox">
-          @if (form().privilegedPriceEnabled) {
-            ✓
-          }
-        </span>
-
-        <strong>Aktivirajte privilegovanu cenu za novog člana</strong>
-      </button>
-
-      @if (form().privilegedPriceEnabled) {
-        <section class="privileged-card">
-          <div class="privileged-card__block">
-            <p>Izaberite nivo privilegovane cene</p>
-
-            <div class="option-grid">
-              @for (discount of privilegedDiscountOptions; track discount) {
-                <button
-                  type="button"
-                  class="option-chip"
-                  [class.option-chip--active]="form().privilegedDiscount === discount"
-                  (click)="selectDiscount(discount)"
-                >
-                  do {{ discount }}%
-                </button>
-              }
-            </div>
+      <section class="invite-promo">
+        <div class="invite-promo__top">
+          <div>
+            <h2>Učlanite nove partnere</h2>
+            <p>
+              Premija do 10% na njihovu prvu kupovinu i provizija od 5% do 40%
+              kroz dalju kupovinu.
+            </p>
           </div>
 
-          <div class="privileged-card__block">
-            <p>Izaberite broj dana trajanja pogodnosti</p>
-
-            <div class="days-grid">
-              @for (days of privilegedDurationOptions; track days) {
-                <button
-                  type="button"
-                  class="day-chip"
-                  [class.day-chip--active]="form().privilegedDays === days"
-                  (click)="selectPrivilegedDays(days)"
-                >
-                  {{ days }} dana
-                </button>
-              }
-            </div>
-          </div>
-        </section>
-      }
-
-      <section class="captcha-section">
-        <div class="captcha-box">
-          <div class="captcha-box__value">{{ captchaCode() }}</div>
-          <button type="button" class="captcha-box__refresh" (click)="refreshCaptcha()">
-            ↻
+          <button type="button" class="share-button" (click)="shareInvite()">
+            ⤴
           </button>
         </div>
 
-        <label class="form-field">
-          <span>Unesite kod sa slike *</span>
-          <input
-            type="text"
-            [value]="form().captchaInput"
-            (input)="updateField('captchaInput', $any($event.target).value.toUpperCase())"
-            placeholder="Unesite captcha kod"
-          />
-        </label>
+        @if (shareMessage()) {
+          <p class="share-message">{{ shareMessage() }}</p>
+        }
+
+        <ul class="invite-promo__bullets">
+          <li>
+            Pozovite nove partnere u <strong>Zepter BizzClub</strong> i podelite
+            im pogodnosti članstva.
+          </li>
+          <li>
+            Novi članovi dobijaju iste osnovne privilegije i pristup Zepter svetu.
+          </li>
+        </ul>
       </section>
 
-      @if (errorMessage()) {
-        <p class="form-error">{{ errorMessage() }}</p>
-      }
+      <section class="invite-form-card">
+        <label class="form-field">
+          <span>Ime *</span>
+          <input
+            type="text"
+            [value]="form().firstName"
+            (input)="updateField('firstName', $any($event.target).value)"
+            placeholder="Unesite ime"
+          />
+        </label>
 
-      <button type="button" class="submit-button" (click)="submitInvite()">
-        {{ submitting() ? 'Slanje...' : 'Pozovi člana' }}
-      </button>
-    </section>
+        <label class="form-field">
+          <span>Prezime *</span>
+          <input
+            type="text"
+            [value]="form().lastName"
+            (input)="updateField('lastName', $any($event.target).value)"
+            placeholder="Unesite prezime"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Email *</span>
+          <input
+            type="email"
+            [value]="form().email"
+            (input)="updateField('email', $any($event.target).value)"
+            placeholder="Unesite email adresu"
+          />
+        </label>
+
+        <div class="phone-row">
+          <label class="form-field form-field--prefix">
+            <span>Pozivni</span>
+            <input
+              type="text"
+              [value]="form().phonePrefix"
+              (input)="updateField('phonePrefix', $any($event.target).value)"
+            />
+          </label>
+
+          <label class="form-field">
+            <span>Telefon *</span>
+            <input
+              type="tel"
+              [value]="form().phone"
+              (input)="updateField('phone', $any($event.target).value)"
+              placeholder="Unesite broj telefona"
+            />
+          </label>
+        </div>
+
+        <p class="form-note">Polja označena zvezdicom su obavezna.</p>
+
+        <button
+          type="button"
+          class="privileged-toggle"
+          [class.privileged-toggle--active]="form().privilegedPriceEnabled"
+          (click)="togglePrivilegedPrice()"
+        >
+          <span class="privileged-toggle__checkbox">
+            @if (form().privilegedPriceEnabled) {
+              ✓
+            }
+          </span>
+
+          <strong>Aktivirajte privilegovanu cenu za novog člana</strong>
+        </button>
+
+        @if (form().privilegedPriceEnabled) {
+          <section class="privileged-card">
+            <div class="privileged-card__block">
+              <p>Izaberite nivo privilegovane cene</p>
+
+              <div class="option-grid">
+                @for (discount of privilegedDiscountOptions; track discount) {
+                  <button
+                    type="button"
+                    class="option-chip"
+                    [class.option-chip--active]="form().privilegedDiscount === discount"
+                    (click)="selectDiscount(discount)"
+                  >
+                    do {{ discount }}%
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div class="privileged-card__block">
+              <p>Izaberite broj dana trajanja pogodnosti</p>
+
+              <div class="days-grid">
+                @for (days of privilegedDurationOptions; track days) {
+                  <button
+                    type="button"
+                    class="day-chip"
+                    [class.day-chip--active]="form().privilegedDays === days"
+                    (click)="selectPrivilegedDays(days)"
+                  >
+                    {{ days }} dana
+                  </button>
+                }
+              </div>
+            </div>
+          </section>
+        }
+
+        <section class="captcha-section">
+          <div class="captcha-box">
+            <div class="captcha-box__value">{{ captchaCode() }}</div>
+            <button type="button" class="captcha-box__refresh" (click)="refreshCaptcha()">
+              ↻
+            </button>
+          </div>
+
+          <label class="form-field">
+            <span>Unesite kod sa slike *</span>
+            <input
+              type="text"
+              [value]="form().captchaInput"
+              (input)="updateField('captchaInput', $any($event.target).value.toUpperCase())"
+              placeholder="Unesite captcha kod"
+            />
+          </label>
+        </section>
+
+        @if (errorMessage()) {
+          <p class="form-error">{{ errorMessage() }}</p>
+        }
+
+        <button type="button" class="submit-button" [disabled]="submitting()" (click)="submitInvite()">
+          {{ submitting() ? 'Slanje...' : 'Pozovi člana' }}
+        </button>
+      </section>
+    } @else {
+      <section class="invite-form-card guest-register-card">
+        <div class="guest-register-card__header">
+          <span>Članstvo</span>
+          <h2>Postanite član Zepter Club-a</h2>
+          <p>
+            Registrujte se i odmah ostvarite pristup pogodnostima, popustima i
+            Zepter BizzClub iskustvu.
+          </p>
+        </div>
+
+        <label class="form-field">
+          <span>Ime *</span>
+          <input
+            type="text"
+            autocomplete="given-name"
+            [value]="registrationForm().firstName"
+            (input)="updateRegistrationField('firstName', $any($event.target).value)"
+            placeholder="Unesite ime"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Prezime *</span>
+          <input
+            type="text"
+            autocomplete="family-name"
+            [value]="registrationForm().lastName"
+            (input)="updateRegistrationField('lastName', $any($event.target).value)"
+            placeholder="Unesite prezime"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Email *</span>
+          <input
+            type="email"
+            autocomplete="email"
+            [value]="registrationForm().email"
+            (input)="updateRegistrationField('email', $any($event.target).value)"
+            placeholder="Unesite email adresu"
+          />
+        </label>
+
+        <div class="phone-row">
+          <label class="form-field form-field--prefix">
+            <span>Pozivni *</span>
+            <input
+              type="text"
+              inputmode="tel"
+              [value]="registrationForm().phonePrefix"
+              (input)="updateRegistrationField('phonePrefix', $any($event.target).value)"
+            />
+          </label>
+
+          <label class="form-field">
+            <span>Telefon *</span>
+            <input
+              type="tel"
+              autocomplete="tel"
+              [value]="registrationForm().phone"
+              (input)="updateRegistrationField('phone', $any($event.target).value)"
+              placeholder="Unesite broj telefona"
+            />
+          </label>
+        </div>
+
+        <label class="form-field">
+          <span>Država *</span>
+          <input
+            type="text"
+            autocomplete="country-name"
+            [value]="registrationForm().country"
+            (input)="updateRegistrationField('country', $any($event.target).value)"
+            placeholder="Republika Srbija"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Grad</span>
+          <input
+            type="text"
+            autocomplete="address-level2"
+            [value]="registrationForm().city"
+            (input)="updateRegistrationField('city', $any($event.target).value)"
+            placeholder="Unesite grad"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Adresa</span>
+          <input
+            type="text"
+            autocomplete="street-address"
+            [value]="registrationForm().address"
+            (input)="updateRegistrationField('address', $any($event.target).value)"
+            placeholder="Unesite adresu"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Lozinka *</span>
+          <input
+            type="password"
+            autocomplete="new-password"
+            [value]="registrationForm().password"
+            (input)="updateRegistrationField('password', $any($event.target).value)"
+            placeholder="Najmanje 6 karaktera"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Potvrdite lozinku *</span>
+          <input
+            type="password"
+            autocomplete="new-password"
+            [value]="registrationForm().confirmPassword"
+            (input)="updateRegistrationField('confirmPassword', $any($event.target).value)"
+            placeholder="Ponovite lozinku"
+          />
+        </label>
+
+        <section class="captcha-section">
+          <div class="captcha-box">
+            <div class="captcha-box__value">{{ captchaCode() }}</div>
+            <button type="button" class="captcha-box__refresh" (click)="refreshCaptcha()">
+              ↻
+            </button>
+          </div>
+
+          <label class="form-field">
+            <span>Unesite kod sa slike *</span>
+            <input
+              type="text"
+              [value]="registrationForm().captchaInput"
+              (input)="updateRegistrationField('captchaInput', $any($event.target).value.toUpperCase())"
+              placeholder="Unesite captcha kod"
+            />
+          </label>
+        </section>
+
+        @if (registrationErrorMessage()) {
+          <p class="form-error">{{ registrationErrorMessage() }}</p>
+        }
+
+        <button
+          type="button"
+          class="submit-button"
+          [disabled]="registrationSubmitting()"
+          (click)="submitRegistration()"
+        >
+          {{ registrationSubmitting() ? 'Registracija...' : 'Registruj se' }}
+        </button>
+
+        <p class="guest-register-card__login">
+          Već imate nalog?
+          <a routerLink="/login">Prijavite se</a>
+        </p>
+      </section>
+    }
   </div>
 
   @if (successModalOpen()) {

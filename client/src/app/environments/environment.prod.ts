@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://your-render-api-url.onrender.com/api',
+  apiUrl: 'https://zepter-mobile-pwa-api.onrender.com/api',
   assetsBaseUrl: ''
 };

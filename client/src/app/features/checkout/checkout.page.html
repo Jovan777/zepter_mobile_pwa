@@ -15,7 +15,7 @@
         }
       </span>
 
-      <h1>Podaci za plaćanje</h1>
+      <h1>{{ isSelling() ? 'Prodaja klijentu' : 'Podaci za plaćanje' }}</h1>
     </div>
   </header>
 
@@ -25,7 +25,7 @@
 
   @if (step() === 'buyer') {
     <section class="checkout-card buyer-form">
-      <h2>Detalji kupca</h2>
+      <h2>{{ isSelling() ? 'Podaci klijenta' : 'Detalji kupca' }}</h2>
 
       <label>
         <span>Ime *</span>
@@ -116,8 +116,24 @@
       
 
       <p class="buyer-form__hint">
-        Unesite broj telefona ili email partnera BizzClub koji vas je preporučio.
+        @if (isSelling()) {
+          Unesite podatke klijenta za ovu prodaju. Porudžbina će biti vezana za vaš partnerski nalog.
+        } @else {
+          Unesite broj telefona ili email partnera BizzClub koji vas je preporučio.
+        }
       </p>
+
+      @if (isSelling()) {
+        <label class="switch-row">
+          <input
+            type="checkbox"
+            [checked]="form().clientWantsClubMembership"
+            (change)="updateField('clientWantsClubMembership', $any($event.target).checked)"
+          />
+
+          <span>Moj klijent želi da postane član ZepterClub-a</span>
+        </label>
+      }
 
       <label class="switch-row">
         <input
@@ -242,7 +258,7 @@
 
       <section class="review-block">
         <header>
-          <span>Vaš porudžbina</span>
+          <span>{{ isSelling() ? 'Prodaja klijentu' : 'Vaša porudžbina' }}</span>
         </header>
 
         <div class="review-products">
@@ -256,7 +272,18 @@
                 <small>{{ item.code }}</small>
               </div>
 
-              <b>{{ item.quantity }}</b>
+              <div class="review-product__meta">
+                <b>{{ item.quantity }}</b>
+                <small>
+                  @if (item.selectedPriceTier === 'retail') {
+                    MP
+                  } @else if (item.selectedPriceTier === 'clubMember') {
+                    Club
+                  } @else {
+                    Partner
+                  }
+                </small>
+              </div>
             </article>
           }
         </div>
@@ -332,7 +359,7 @@
       </section>
 
       <button class="checkout-submit" type="button" [disabled]="loading()" (click)="submitOrder()">
-        {{ loading() ? 'Slanje...' : 'Pošalji porudžbinu' }}
+        {{ loading() ? 'Slanje...' : 'Naruči i plati' }}
       </button>
     </section>
   }

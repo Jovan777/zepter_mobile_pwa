@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { CalculatedCartItem, PriceTier } from '../../core/models/cart.model';
+import { CalculatedCartItem } from '../../core/models/cart.model';
 import { CartService } from '../../core/services/cart.service';
 import { CommerceModeService } from '../../core/services/commerce-mode.service';
 import { RsdCurrencyPipe } from '../../shared/pipes/rsd-currency.pipe';
@@ -23,7 +23,6 @@ export class CartPage implements OnInit {
   readonly mode = this.commerceModeService.mode;
   readonly modeLabel = this.commerceModeService.modeLabel;
 
-  readonly selectedPriceTier = signal<PriceTier>('clubMember');
   readonly loading = signal(false);
   readonly message = signal('');
 
@@ -48,17 +47,17 @@ export class CartPage implements OnInit {
   }
 
   increaseQuantity(item: CalculatedCartItem): void {
-    this.cartService.updateQuantity(item.productPublicId, item.quantity + 1);
+    this.cartService.updateQuantity(item.productPublicId, item.quantity + 1, item.selectedPriceTier);
     this.recalculateCart();
   }
 
   decreaseQuantity(item: CalculatedCartItem): void {
-    this.cartService.updateQuantity(item.productPublicId, item.quantity - 1);
+    this.cartService.updateQuantity(item.productPublicId, item.quantity - 1, item.selectedPriceTier);
     this.recalculateCart();
   }
 
   removeItem(item: CalculatedCartItem): void {
-    this.cartService.removeItem(item.productPublicId);
+    this.cartService.removeItem(item.productPublicId, item.selectedPriceTier);
     this.recalculateCart();
   }
 
@@ -93,7 +92,7 @@ export class CartPage implements OnInit {
 
     this.loading.set(true);
 
-    this.cartService.calculate(this.selectedPriceTier()).subscribe({
+    this.cartService.calculate().subscribe({
       next: () => {
         this.loading.set(false);
       },
