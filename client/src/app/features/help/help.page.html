@@ -1,0 +1,241 @@
+<section class="help-page">
+  <header class="help-top">
+    <button type="button" aria-label="Nazad" (click)="goBack()">←</button>
+    <h1>Pomoć</h1>
+    <span></span>
+  </header>
+
+  <main
+    class="help-slide"
+    [class.help-slide--animate]="animate()"
+    [class.help-slide--next]="direction() === 'next'"
+    [class.help-slide--prev]="direction() === 'prev'"
+  >
+    <div class="help-bg-shape help-bg-shape--one"></div>
+    <div class="help-bg-shape help-bg-shape--two"></div>
+    <div class="help-bg-shape help-bg-shape--three"></div>
+
+    @if (activeSlide().visual !== 'start') {
+      <div class="help-info-icon">i</div>
+    }
+
+    <section class="help-copy" [class.help-copy--start]="activeSlide().visual === 'start'">
+      @if (activeSlide().visual === 'start') {
+        <img src="/assets/images/logos/zepter-logo.png" alt="Zepter" class="help-start-logo" />
+        <div class="help-bizz-logo">Zepter<br />Bizz<br />Club</div>
+      }
+
+      <h2>{{ activeSlide().title }}</h2>
+
+      @if (activeSlide().subtitle) {
+        <p>{{ activeSlide().subtitle }}</p>
+      }
+    </section>
+
+    <section class="help-visual" [class]="'help-visual help-visual--' + activeSlide().visual">
+      @if (activeSlide().visual === 'search') {
+        <div class="mock-screen mock-screen--products">
+          <div class="mock-header">
+            <span>←</span>
+            <div class="mock-logo">zepter</div>
+            <span>🛒</span>
+          </div>
+
+          <div class="mock-search mock-highlight">
+            <span></span>
+            <b>⌕</b>
+          </div>
+
+          <div class="mock-grid">
+            @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+              <div class="mock-product-card">
+                <i></i>
+                <span></span>
+                <small></small>
+                <small></small>
+              </div>
+            }
+          </div>
+
+          <div class="help-hand help-hand--search">☝</div>
+        </div>
+      }
+
+      @if (activeSlide().visual === 'cart') {
+        <div class="mock-screen mock-screen--products">
+          <div class="mock-header">
+            <span>←</span>
+            <div class="mock-logo">zepter</div>
+            <span class="mock-cart-icon mock-highlight-circle">🛒</span>
+          </div>
+
+          <div class="mock-search">
+            <span></span>
+            <b>⌕</b>
+          </div>
+
+          <div class="mock-grid">
+            @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+              <div class="mock-product-card" [class.mock-highlight]="item === 2">
+                <i></i>
+                <span></span>
+                <small></small>
+                <small></small>
+              </div>
+            }
+          </div>
+
+          <div class="help-hand help-hand--cart">☝<em>2x</em></div>
+        </div>
+      }
+
+      @if (activeSlide().visual === 'share') {
+        <div class="mock-screen mock-screen--share">
+          <div class="mock-logo-large">zepter</div>
+          <div class="mock-bizz">Bizz<br />Club</div>
+
+          <div class="mock-offer-card">
+            <span></span>
+            <span></span>
+            <span></span>
+            <b>↗</b>
+          </div>
+
+          <div class="mock-form-lines">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <div class="mock-share-badge">⌯</div>
+          <div class="help-hand help-hand--share">☝</div>
+        </div>
+      }
+
+      @if (activeSlide().visual === 'cart-review') {
+        <div class="mock-screen mock-screen--cart-review">
+          <div class="mock-header">
+            <span>←</span>
+            <div class="mock-logo">zepter</div>
+            <span class="mock-highlight-circle">🛒</span>
+          </div>
+
+          @for (item of [1, 2, 3]; track item) {
+            <div class="mock-cart-row" [class.mock-highlight]="item === 1">
+              <i></i>
+              <div>
+                <span></span>
+                <span></span>
+                <small></small>
+              </div>
+              <b>🗑</b>
+            </div>
+          }
+        </div>
+      }
+
+      @if (activeSlide().visual === 'payment') {
+        <div class="mock-screen mock-screen--payment">
+          <div class="mock-header">
+            <span>←</span>
+            <div>Oformljenje porudžbine</div>
+            <span></span>
+          </div>
+
+          <div class="mock-stepper">
+            <i></i>
+            <i></i>
+            <i></i>
+          </div>
+
+          <div class="mock-payment-card mock-highlight">
+            <b>💳</b>
+          </div>
+
+          <div class="mock-payment-card">
+            <b>💵</b>
+          </div>
+
+          <div class="mock-card-brands">
+            <span>AMEX</span>
+            <span>VISA</span>
+            <span>MC</span>
+            <span>DIN</span>
+          </div>
+        </div>
+      }
+
+      @if (activeSlide().visual === 'orders') {
+        <div class="mock-screen mock-screen--orders">
+          <div class="mock-header">
+            <span>←</span>
+            <div>Porudžbine</div>
+            <span></span>
+          </div>
+
+          @for (item of [1, 2, 3, 4]; track item) {
+            <div class="mock-order-row" [class.mock-highlight]="item === 1">
+              <span></span>
+              <span></span>
+              <span></span>
+              <b>›</b>
+            </div>
+          }
+        </div>
+      }
+
+      @if (activeSlide().visual === 'invite') {
+        <div class="mock-screen mock-screen--invite">
+          <div class="mock-header">
+            <span>←</span>
+            <div>Pozovite člana</div>
+            <span></span>
+          </div>
+
+          <div class="mock-logo-large">zepter</div>
+          <div class="mock-bizz">Bizz<br />Club</div>
+
+          <div class="mock-invite-lines">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span class="mock-highlight"></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <div class="help-hand help-hand--invite">☝</div>
+        </div>
+      }
+
+      @if (activeSlide().visual === 'start') {
+        <div class="start-illustration">
+          <div class="start-person start-person--shadow"></div>
+          <div class="start-person"></div>
+          <div class="start-bag"></div>
+        </div>
+      }
+    </section>
+  </main>
+
+  <footer class="help-footer">
+    <button type="button" class="help-footer__nav" [disabled]="isFirst()" (click)="goBack()">
+      Nazad
+    </button>
+
+    <div class="help-dots">
+      @for (slide of slides; track slide.title; let index = $index) {
+        <button
+          type="button"
+          [class.active]="activeIndex() === index"
+          aria-label="Idi na korak"
+          (click)="goToSlide(index)"
+        ></button>
+      }
+    </div>
+
+    <button type="button" class="help-footer__nav help-footer__nav--next" (click)="goNext()">
+      {{ isLast() ? 'Start' : 'Napred' }}
+    </button>
+  </footer>
+</section>
