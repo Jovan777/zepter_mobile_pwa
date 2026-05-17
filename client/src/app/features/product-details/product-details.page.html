@@ -51,7 +51,33 @@
       <p>{{ item.code }}</p>
     </section>
 
-    <app-price-stack [product]="item" />
+    <section class="product-tier-actions">
+      @for (tier of visiblePriceTiers(); track tier) {
+        <div
+          class="product-tier-row"
+          [class.product-tier-row--retail]="tier === 'retail'"
+          [class.product-tier-row--clubMember]="tier === 'clubMember'"
+          [class.product-tier-row--clubPartner]="tier === 'clubPartner'"
+        >
+          <span>
+            {{ priceTierLabel(tier) }}
+            @if (discountForTier(tier) > 0) {
+              <small>-{{ discountForTier(tier) }}%</small>
+            }
+          </span>
+
+          <strong>{{ item.prices[tier] | rsdCurrency }}</strong>
+
+          <button
+            type="button"
+            [attr.aria-label]="'Dodaj u korpu - ' + priceTierLabel(tier)"
+            (click)="addToCart(tier)"
+          >
+            🛒
+          </button>
+        </div>
+      }
+    </section>
 
     @if (addedMessage()) {
       <div class="product-details__toast">
@@ -105,18 +131,5 @@
         </dl>
       }
     </section>
-
-    <footer class="product-buy-bar">
-      @for (tier of visiblePriceTiers(); track tier) {
-        <button
-          type="button"
-          [class.product-buy-bar__partner]="tier === 'clubPartner'"
-          (click)="addToCart(tier)"
-        >
-          <span>{{ priceTierLabel(tier) }}</span>
-          <strong>{{ item.prices[tier] | rsdCurrency }}</strong>
-        </button>
-      }
-    </footer>
   }
 </section>

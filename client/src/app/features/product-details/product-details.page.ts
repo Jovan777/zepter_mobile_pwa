@@ -6,7 +6,6 @@ import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
 import { ProductService } from '../../core/services/product.service';
 import { WishlistService } from '../../core/services/wishlist.service';
-import { PriceStackComponent } from '../../shared/components/price-stack/price-stack.component';
 import { RsdCurrencyPipe } from '../../shared/pipes/rsd-currency.pipe';
 import { assetUrl } from '../../shared/utils/asset-url.util';
 
@@ -15,7 +14,7 @@ type ProductTab = 'description' | 'details' | 'technical';
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [RouterLink, PriceStackComponent, RsdCurrencyPipe],
+  imports: [RouterLink, RsdCurrencyPipe],
   templateUrl: './product-details.page.html',
   styleUrl: './product-details.page.scss'
 })
@@ -99,6 +98,24 @@ export class ProductDetailsPage implements OnInit {
     };
 
     return labels[tier];
+  }
+
+  discountForTier(tier: PriceTier): number {
+    const product = this.product();
+
+    if (!product) {
+      return 0;
+    }
+
+    if (tier === 'clubMember') {
+      return product.discounts.clubMemberPercent;
+    }
+
+    if (tier === 'clubPartner') {
+      return product.discounts.clubPartnerPercent;
+    }
+
+    return 0;
   }
 
   addToCart(tier: PriceTier): void {

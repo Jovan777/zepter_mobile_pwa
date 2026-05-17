@@ -24,33 +24,30 @@
   </a>
 
   <section class="product-card__prices">
-    <div class="product-card__price product-card__price--retail">
-      <span>MP cena</span>
-      <strong>{{ product.prices.retail | rsdCurrency }}</strong>
-    </div>
-
-    <div class="product-card__price product-card__price--club">
-      <span>
-        BizzClub
-        @if (product.discounts.clubMemberPercent > 0) {
-          <small>-{{ product.discounts.clubMemberPercent }}%</small>
-        }
-      </span>
-
-      <strong>{{ product.prices.clubMember | rsdCurrency }}</strong>
-    </div>
-  </section>
-
-  <section class="product-card__cart-actions" aria-label="Dodaj u korpu">
     @for (tier of visiblePriceTiers; track tier) {
-      <button
-        type="button"
-        [class.product-card__cart-action--partner]="tier === 'clubPartner'"
-        (click)="addToCart(tier)"
+      <div
+        class="product-card__price"
+        [class.product-card__price--retail]="tier === 'retail'"
+        [class.product-card__price--clubMember]="tier === 'clubMember'"
+        [class.product-card__price--clubPartner]="tier === 'clubPartner'"
       >
-        <span>{{ priceTierLabel(tier) }}</span>
+        <span>
+          {{ priceTierLabel(tier) }}
+          @if (discountForTier(tier) > 0) {
+            <small>-{{ discountForTier(tier) }}%</small>
+          }
+        </span>
+
         <strong>{{ priceForTier(tier) | rsdCurrency }}</strong>
-      </button>
+
+        <button
+          type="button"
+          [attr.aria-label]="'Dodaj u korpu - ' + priceTierLabel(tier)"
+          (click)="addToCart(tier)"
+        >
+          🛒
+        </button>
+      </div>
     }
   </section>
 </article>

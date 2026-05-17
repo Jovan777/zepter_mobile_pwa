@@ -51,9 +51,9 @@ export class ProductCardComponent {
 
   priceTierLabel(tier: PriceTier): string {
     const labels: Record<PriceTier, string> = {
-      retail: 'MP',
-      clubMember: 'Club',
-      clubPartner: 'Partner'
+      retail: 'MP cena',
+      clubMember: 'ZepterClub cena',
+      clubPartner: 'Partner cena'
     };
 
     return labels[tier];
@@ -61,6 +61,18 @@ export class ProductCardComponent {
 
   priceForTier(tier: PriceTier): number {
     return this.product.prices[tier];
+  }
+
+  discountForTier(tier: PriceTier): number {
+    if (tier === 'clubMember') {
+      return this.product.discounts.clubMemberPercent;
+    }
+
+    if (tier === 'clubPartner') {
+      return this.product.discounts.clubPartnerPercent;
+    }
+
+    return 0;
   }
 
   addToCart(tier: PriceTier): void {
