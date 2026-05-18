@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PriceTier } from '../../core/models/cart.model';
 import { Product } from '../../core/models/product.model';
@@ -25,6 +25,8 @@ export class ProductDetailsPage implements OnInit {
   private readonly cartService = inject(CartService);
   private readonly wishlistService = inject(WishlistService);
 
+  @ViewChild('galleryTrack') private galleryTrack?: ElementRef<HTMLElement>;
+
   readonly product = signal<Product | null>(null);
   readonly loading = signal(true);
   readonly errorMessage = signal('');
@@ -32,13 +34,6 @@ export class ProductDetailsPage implements OnInit {
   readonly selectedImageIndex = signal(0);
   readonly selectedTab = signal<ProductTab>('description');
   readonly addedMessage = signal('');
-
-  readonly activeImage = computed(() => {
-    const product = this.product();
-    const index = this.selectedImageIndex();
-
-    return assetUrl(product?.images?.[index]);
-  });
 
   readonly isWishlisted = computed(() => {
     const product = this.product();
@@ -84,6 +79,23 @@ export class ProductDetailsPage implements OnInit {
 
   selectImage(index: number): void {
     this.selectedImageIndex.set(index);
+    this.scrollGalleryTo(index);
+  }
+
+  onGalleryScroll(event: Event): void {
+    const element = event.target as HTMLElement;
+
+    if (!element.clientWidth) {
+      return;
+    }
+
+    const nextIndex = Math.round(element.scrollLeft / element.clientWidth);
+    const maxIndex = Math.max((this.product()?.images?.length || 1) - 1, 0);
+    this.selectedImageIndex.set(Math.max(0, Math.min(nextIndex, maxIndex)));
+  }
+
+  imageSrc(path: string): string {
+    return assetUrl(path);
   }
 
   selectTab(tab: ProductTab): void {
@@ -171,12 +183,26 @@ export class ProductDetailsPage implements OnInit {
         this.product.set(product);
         this.selectedImageIndex.set(0);
         this.loading.set(false);
+        this.scrollGalleryTo(0, 'auto');
       },
       error: () => {
         this.product.set(null);
         this.loading.set(false);
         this.errorMessage.set('Proizvod trenutno nije dostupan.');
       }
+    });
+  }
+
+  private scrollGalleryTo(index: number, behavior: ScrollBehavior = 'smooth'): void {
+    const element = this.galleryTrack?.nativeElement;
+
+    if (!element) {
+      return;
+    }
+
+    element.scrollTo({
+      left: element.clientWidth * index,
+      behavior
     });
   }
 }

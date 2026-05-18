@@ -17,22 +17,31 @@
     </section>
   } @else if (product(); as item) {
     <section class="product-gallery">
-      <div class="product-gallery__image">
-        <img [src]="activeImage()" [alt]="item.name" />
+      <div class="product-gallery__track" #galleryTrack (scroll)="onGalleryScroll($event)">
+        @for (image of item.images; track image) {
+          <div class="product-gallery__slide">
+            <img [src]="imageSrc(image)" [alt]="item.name" />
+          </div>
+        }
       </div>
 
       <div class="product-gallery__actions">
         <button type="button" aria-label="Podeli proizvod" (click)="shareProduct()">⌯</button>
 
-        <div class="product-gallery__dots">
-          @for (image of item.images; track image; let index = $index) {
-            <button
-              type="button"
-              [class.active]="selectedImageIndex() === index"
-              (click)="selectImage(index)"
-            ></button>
-          }
-        </div>
+        @if (item.images.length > 1) {
+          <div class="product-gallery__dots">
+            @for (image of item.images; track image; let index = $index) {
+              <button
+                type="button"
+                [class.active]="selectedImageIndex() === index"
+                [attr.aria-label]="'Prikaži sliku ' + (index + 1)"
+                (click)="selectImage(index)"
+              ></button>
+            }
+          </div>
+        } @else {
+          <div></div>
+        }
 
         <button
           type="button"

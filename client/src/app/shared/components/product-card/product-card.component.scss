@@ -9,6 +9,10 @@
   box-shadow: var(--shadow-soft);
 }
 
+.product-card:active {
+  box-shadow: 0 10px 24px rgba(17, 17, 17, 0.08);
+}
+
 .product-card__media {
   display: grid;
   place-items: center;
@@ -20,6 +24,11 @@
   width: 100%;
   height: 112px;
   object-fit: contain;
+  transition: transform 180ms ease;
+}
+
+.product-card:active .product-card__media img {
+  transform: scale(0.985);
 }
 
 .product-card__wishlist {
@@ -36,6 +45,7 @@
   color: var(--color-muted);
   font-size: 18px;
   line-height: 1;
+  box-shadow: 0 8px 18px rgba(17, 17, 17, 0.08);
 }
 
 .product-card__wishlist--active {
@@ -95,6 +105,9 @@
   gap: 8px;
   padding: 7px 8px 7px 10px;
   background: #f3f3f3;
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .product-card__price span,
@@ -142,6 +155,12 @@
   color: var(--color-gold-dark);
   font-size: 15px;
   box-shadow: inset 0 0 0 1px rgba(163, 107, 0, 0.14);
+}
+
+.product-card__price button:not(:disabled):active {
+  box-shadow:
+    inset 0 0 0 1px rgba(163, 107, 0, 0.22),
+    0 5px 12px rgba(163, 107, 0, 0.12);
 }
 
 .product-card__price--clubMember {

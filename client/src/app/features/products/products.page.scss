@@ -105,12 +105,17 @@
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28);
 }
 
+.filter-fab:active {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+}
+
 .filter-backdrop {
   position: fixed;
   inset: 0;
   z-index: 80;
   border: 0;
   background: rgba(0, 0, 0, 0.42);
+  animation: filter-backdrop-in 180ms ease both;
 }
 
 .filter-sheet {
@@ -126,6 +131,7 @@
   padding: 10px 16px max(18px, env(safe-area-inset-bottom));
   background: #ffffff;
   box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.22);
+  animation: filter-sheet-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .filter-sheet__handle {
@@ -201,6 +207,10 @@
   color: var(--color-gold-dark);
 }
 
+.filter-sheet__buttons button:active {
+  border-color: rgba(163, 107, 0, 0.42);
+}
+
 .filter-sheet__apply {
   min-height: 50px;
   border: 0;
@@ -208,6 +218,28 @@
   background: var(--color-gold-dark);
   color: #ffffff;
   font-weight: 900;
+}
+
+@keyframes filter-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes filter-sheet-in {
+  from {
+    opacity: 0.4;
+    transform: translate(-50%, 18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
 @keyframes skeleton-loading {
